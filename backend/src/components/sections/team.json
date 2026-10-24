@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_sections_teams",
+  "info": {
+    "displayName": "Tiimi",
+    "icon": "user"
+  },
+  "options": {},
+  "attributes": {
+    "eyebrow": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "members": {
+      "type": "component",
+      "component": "shared.team-member",
+      "repeatable": true
+    }
+  }
+}

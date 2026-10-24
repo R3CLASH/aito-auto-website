@@ -1,0 +1,41 @@
+{
+  "collectionName": "components_sections_hero_showrooms",
+  "info": {
+    "displayName": "Hero – näyttelytila",
+    "icon": "landscape"
+  },
+  "options": {},
+  "attributes": {
+    "eyebrow": {
+      "type": "string"
+    },
+    "titleLine1": {
+      "type": "string",
+      "required": true
+    },
+    "titleLine2": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "primaryCta": {
+      "type": "component",
+      "component": "shared.link",
+      "repeatable": false
+    },
+    "secondaryCta": {
+      "type": "component",
+      "component": "shared.link",
+      "repeatable": false
+    },
+    "showroomLabel": {
+      "type": "string",
+      "default": "Näyttelytila"
+    },
+    "plateText": {
+      "type": "string",
+      "maxLength": 8
+    }
+  }
+}

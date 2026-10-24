@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_sections_inventory_browsers",
+  "info": {
+    "displayName": "Autolistaus + suodatus",
+    "icon": "filter"
+  },
+  "options": {},
+  "attributes": {
+    "emptyTitle": {
+      "type": "string",
+      "default": "Ei juuri nyt myynnissä"
+    },
+    "emptyText": {
+      "type": "text"
+    },
+    "disclaimer": {
+      "type": "text"
+    }
+  }
+}

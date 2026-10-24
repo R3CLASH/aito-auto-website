@@ -1,0 +1,72 @@
+{
+  "kind": "singleType",
+  "collectionName": "finance_settings",
+  "info": {
+    "singularName": "finance-setting",
+    "pluralName": "finance-settings",
+    "displayName": "Rahoitusasetukset (Finance)"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "interestRate": {
+      "type": "decimal",
+      "required": true,
+      "default": 4.9
+    },
+    "interestMin": {
+      "type": "decimal",
+      "default": 1.9
+    },
+    "interestMax": {
+      "type": "decimal",
+      "default": 9.9
+    },
+    "openingFee": {
+      "type": "integer",
+      "default": 190
+    },
+    "monthlyFee": {
+      "type": "integer",
+      "default": 9
+    },
+    "defaultDownPct": {
+      "type": "integer",
+      "default": 10
+    },
+    "maxDownPct": {
+      "type": "integer",
+      "default": 50
+    },
+    "downStep": {
+      "type": "integer",
+      "default": 5
+    },
+    "defaultTermMonths": {
+      "type": "integer",
+      "default": 60
+    },
+    "termOptions": {
+      "type": "json"
+    },
+    "maxBalloonPct": {
+      "type": "integer",
+      "default": 35
+    },
+    "balloonStep": {
+      "type": "integer",
+      "default": 5
+    },
+    "partnerName": {
+      "type": "string"
+    },
+    "exampleNote": {
+      "type": "text"
+    },
+    "disclaimer": {
+      "type": "text"
+    }
+  }
+}

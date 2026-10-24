@@ -1,0 +1,71 @@
+{
+  "kind": "collectionType",
+  "collectionName": "leads",
+  "info": {
+    "singularName": "lead",
+    "pluralName": "leads",
+    "displayName": "Yhteydenotto (Lead)"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "phone": {
+      "type": "string",
+      "required": true
+    },
+    "email": {
+      "type": "email"
+    },
+    "topic": {
+      "type": "string"
+    },
+    "message": {
+      "type": "text"
+    },
+    "carTitle": {
+      "type": "string"
+    },
+    "car": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::car.car"
+    },
+    "tradeIn": {
+      "type": "string"
+    },
+    "calculation": {
+      "type": "json"
+    },
+    "sourcePage": {
+      "type": "string"
+    },
+    "channel": {
+      "type": "enumeration",
+      "enum": [
+        "whatsapp",
+        "form"
+      ],
+      "default": "form",
+      "required": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "new",
+        "contacted",
+        "closed"
+      ],
+      "default": "new",
+      "required": true
+    },
+    "internalNotes": {
+      "type": "text"
+    }
+  }
+}

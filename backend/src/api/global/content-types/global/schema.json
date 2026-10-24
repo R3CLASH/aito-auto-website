@@ -1,0 +1,101 @@
+{
+  "kind": "singleType",
+  "collectionName": "globals",
+  "info": {
+    "singularName": "global",
+    "pluralName": "globals",
+    "displayName": "Yleiset asetukset (Global)"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "siteName": {
+      "type": "string",
+      "required": true,
+      "default": "Aito Auto Oy"
+    },
+    "tagline": {
+      "type": "string"
+    },
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "whatsappNumber": {
+      "type": "string",
+      "required": true,
+      "regex": "^[0-9]{6,15}$"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "phoneDisplay": {
+      "type": "string"
+    },
+    "email": {
+      "type": "email"
+    },
+    "street": {
+      "type": "string"
+    },
+    "postalCode": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "businessId": {
+      "type": "string"
+    },
+    "invoicingAddress": {
+      "type": "string"
+    },
+    "mapsUrl": {
+      "type": "string"
+    },
+    "mapEmbedUrl": {
+      "type": "string"
+    },
+    "openingHours": {
+      "type": "component",
+      "component": "shared.opening-hour",
+      "repeatable": true
+    },
+    "openingHoursNote": {
+      "type": "string"
+    },
+    "navigation": {
+      "type": "component",
+      "component": "shared.link",
+      "repeatable": true
+    },
+    "headerCta": {
+      "type": "component",
+      "component": "shared.link",
+      "repeatable": false
+    },
+    "footerTagline": {
+      "type": "string"
+    },
+    "footerLinks": {
+      "type": "component",
+      "component": "shared.link",
+      "repeatable": true
+    },
+    "whatsappTopics": {
+      "type": "component",
+      "component": "shared.option",
+      "repeatable": true
+    },
+    "defaultSeo": {
+      "type": "component",
+      "component": "shared.seo",
+      "repeatable": false
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_sections_brand_tickers",
+  "info": {
+    "displayName": "Merkkinauha",
+    "icon": "slideshow"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "default": "Myynnissä olevat merkit"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_sections_visit_ctas",
+  "info": {
+    "displayName": "Tervetuloa käymään",
+    "icon": "pinMap"
+  },
+  "options": {},
+  "attributes": {
+    "eyebrow": {
+      "type": "string"
+    },
+    "buttonLabel": {
+      "type": "string",
+      "default": "Yhteystiedot ja kartta"
+    },
+    "buttonUrl": {
+      "type": "string",
+      "default": "/yhteystiedot"
+    }
+  }
+}

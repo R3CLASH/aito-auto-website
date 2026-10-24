@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_sections_page_headers",
+  "info": {
+    "displayName": "Sivun otsikko",
+    "icon": "heading"
+  },
+  "options": {},
+  "attributes": {
+    "eyebrow": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "intro": {
+      "type": "text"
+    },
+    "variant": {
+      "type": "enumeration",
+      "enum": [
+        "dark",
+        "light"
+      ],
+      "default": "dark"
+    }
+  }
+}

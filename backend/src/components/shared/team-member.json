@@ -1,0 +1,34 @@
+{
+  "collectionName": "components_shared_team_members",
+  "info": {
+    "displayName": "Tiimiläinen / Team member",
+    "icon": "user"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "role": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "email"
+    },
+    "photo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "plate": {
+      "type": "string",
+      "maxLength": 8
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_sections_quick_searchs",
+  "info": {
+    "displayName": "Pikahaku",
+    "icon": "search"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "hint": {
+      "type": "string"
+    },
+    "buttonLabel": {
+      "type": "string",
+      "default": "Näytä autot"
+    }
+  }
+}

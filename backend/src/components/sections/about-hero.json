@@ -1,0 +1,32 @@
+{
+  "collectionName": "components_sections_about_heros",
+  "info": {
+    "displayName": "Meistä – hero",
+    "icon": "emotionHappy"
+  },
+  "options": {},
+  "attributes": {
+    "eyebrow": {
+      "type": "string"
+    },
+    "line1": {
+      "type": "string",
+      "required": true
+    },
+    "highlight": {
+      "type": "string"
+    },
+    "line2": {
+      "type": "string"
+    },
+    "text": {
+      "type": "text"
+    },
+    "stampText": {
+      "type": "string"
+    },
+    "stampYear": {
+      "type": "string"
+    }
+  }
+}

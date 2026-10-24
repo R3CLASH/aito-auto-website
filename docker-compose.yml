@@ -1,0 +1,23 @@
+# Local PostgreSQL for development: `docker compose up -d`
+# Credentials match backend/.env.example.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: aito-auto-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: aito_auto
+      POSTGRES_USER: aito
+      POSTGRES_PASSWORD: aito
+    ports:
+      - '5432:5432'
+    volumes:
+      - aito_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U aito -d aito_auto']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  aito_pgdata:

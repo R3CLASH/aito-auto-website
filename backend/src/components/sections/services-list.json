@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_sections_services_lists",
+  "info": {
+    "displayName": "Palvelulista",
+    "icon": "bulletList"
+  },
+  "options": {},
+  "attributes": {
+    "eyebrow": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "linkLabel": {
+      "type": "string"
+    },
+    "linkUrl": {
+      "type": "string"
+    },
+    "rows": {
+      "type": "component",
+      "component": "shared.service-row",
+      "repeatable": true
+    }
+  }
+}

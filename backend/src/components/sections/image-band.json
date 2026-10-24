@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_sections_image_bands",
+  "info": {
+    "displayName": "Kuvanauha",
+    "icon": "picture"
+  },
+  "options": {},
+  "attributes": {
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "alt": {
+      "type": "string"
+    },
+    "plateText": {
+      "type": "string",
+      "maxLength": 8
+    }
+  }
+}

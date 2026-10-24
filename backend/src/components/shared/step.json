@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_shared_steps",
+  "info": {
+    "displayName": "Vaihe / Step",
+    "icon": "arrowRight"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "text": {
+      "type": "text"
+    }
+  }
+}

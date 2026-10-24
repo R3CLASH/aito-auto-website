@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_shared_opening_hours",
+  "info": {
+    "displayName": "Aukioloaika / Opening hour",
+    "icon": "clock"
+  },
+  "options": {},
+  "attributes": {
+    "dayIndex": {
+      "type": "integer",
+      "required": true,
+      "min": 1,
+      "max": 7
+    },
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "opens": {
+      "type": "string"
+    },
+    "closes": {
+      "type": "string"
+    },
+    "closed": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

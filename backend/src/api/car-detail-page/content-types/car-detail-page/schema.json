@@ -1,0 +1,73 @@
+{
+  "kind": "singleType",
+  "collectionName": "car_detail_pages",
+  "info": {
+    "singularName": "car-detail-page",
+    "pluralName": "car-detail-pages",
+    "displayName": "Auton sivu (Car page template)"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "trustBadges": {
+      "type": "component",
+      "component": "shared.option",
+      "repeatable": true
+    },
+    "specsTitle": {
+      "type": "string",
+      "default": "Perustiedot"
+    },
+    "equipmentTitle": {
+      "type": "string",
+      "default": "Mukana"
+    },
+    "calculatorEyebrow": {
+      "type": "string",
+      "default": "Osamaksulaskuri"
+    },
+    "calculatorTitle": {
+      "type": "string",
+      "default": "Säädä erä sopivaksi"
+    },
+    "descriptionTitle": {
+      "type": "string",
+      "default": "Myyjän kuvaus"
+    },
+    "descriptionFallback": {
+      "type": "text"
+    },
+    "similarTitle": {
+      "type": "string",
+      "default": "Muut samanlaiset"
+    },
+    "blocks": {
+      "type": "dynamiczone",
+      "components": [
+        "sections.hero-showroom",
+        "sections.quick-search",
+        "sections.statement",
+        "sections.brand-ticker",
+        "sections.vehicle-types-grid",
+        "sections.latest-cars",
+        "sections.process-road",
+        "sections.finance-teaser",
+        "sections.services-list",
+        "sections.cta-banner",
+        "sections.page-header",
+        "sections.inventory-browser",
+        "sections.services-detail",
+        "sections.faq",
+        "sections.about-hero",
+        "sections.image-band",
+        "sections.values-list",
+        "sections.team",
+        "sections.visit-cta",
+        "sections.contact-hub",
+        "sections.rich-text"
+      ]
+    }
+  }
+}

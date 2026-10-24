@@ -1,0 +1,31 @@
+{
+  "collectionName": "components_sections_contact_hubs",
+  "info": {
+    "displayName": "Yhteydenotto",
+    "icon": "message"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "formTitle": {
+      "type": "string",
+      "default": "Jätä viesti"
+    },
+    "formIntro": {
+      "type": "text"
+    },
+    "consentText": {
+      "type": "text"
+    },
+    "successTitle": {
+      "type": "string",
+      "default": "Kiitos!"
+    },
+    "successText": {
+      "type": "text"
+    }
+  }
+}

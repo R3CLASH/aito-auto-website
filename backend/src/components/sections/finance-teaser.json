@@ -1,0 +1,32 @@
+{
+  "collectionName": "components_sections_finance_teasers",
+  "info": {
+    "displayName": "Rahoitusnosto",
+    "icon": "chartPie"
+  },
+  "options": {},
+  "attributes": {
+    "eyebrow": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "text": {
+      "type": "text"
+    },
+    "exampleLabel": {
+      "type": "string"
+    },
+    "examplePrice": {
+      "type": "integer"
+    },
+    "buttonLabel": {
+      "type": "string"
+    },
+    "buttonUrl": {
+      "type": "string"
+    }
+  }
+}

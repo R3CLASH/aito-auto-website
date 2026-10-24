@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_sections_services_details",
+  "info": {
+    "displayName": "Palvelut (kaikki)",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "indexLabel": {
+      "type": "string",
+      "default": "Sisällys"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_sections_vehicle_types_grids",
+  "info": {
+    "displayName": "Ajoneuvotyypit",
+    "icon": "apps"
+  },
+  "options": {},
+  "attributes": {
+    "eyebrow": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "linkLabel": {
+      "type": "string",
+      "default": "Kaikki autot →"
+    }
+  }
+}

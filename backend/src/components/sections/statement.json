@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_sections_statements",
+  "info": {
+    "displayName": "Iskulause",
+    "icon": "quote"
+  },
+  "options": {},
+  "attributes": {
+    "term": {
+      "type": "string"
+    },
+    "definition": {
+      "type": "string"
+    },
+    "text": {
+      "type": "text",
+      "required": true
+    },
+    "highlight": {
+      "type": "string"
+    },
+    "muted": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_shared_options",
+  "info": {
+    "displayName": "Valinta / Option",
+    "icon": "bulletList"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

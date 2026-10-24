@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_sections_values_lists",
+  "info": {
+    "displayName": "Arvot",
+    "icon": "star"
+  },
+  "options": {},
+  "attributes": {
+    "eyebrow": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "intro": {
+      "type": "text"
+    },
+    "items": {
+      "type": "component",
+      "component": "shared.value-item",
+      "repeatable": true
+    }
+  }
+}

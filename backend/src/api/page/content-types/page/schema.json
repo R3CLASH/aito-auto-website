@@ -1,0 +1,55 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pages",
+  "info": {
+    "singularName": "page",
+    "pluralName": "pages",
+    "displayName": "Sivu (Page)"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "seo": {
+      "type": "component",
+      "component": "shared.seo",
+      "repeatable": false
+    },
+    "blocks": {
+      "type": "dynamiczone",
+      "components": [
+        "sections.hero-showroom",
+        "sections.quick-search",
+        "sections.statement",
+        "sections.brand-ticker",
+        "sections.vehicle-types-grid",
+        "sections.latest-cars",
+        "sections.process-road",
+        "sections.finance-teaser",
+        "sections.services-list",
+        "sections.cta-banner",
+        "sections.page-header",
+        "sections.inventory-browser",
+        "sections.services-detail",
+        "sections.faq",
+        "sections.about-hero",
+        "sections.image-band",
+        "sections.values-list",
+        "sections.team",
+        "sections.visit-cta",
+        "sections.contact-hub",
+        "sections.rich-text"
+      ]
+    }
+  }
+}

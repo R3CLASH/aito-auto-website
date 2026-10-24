@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_sections_process_roads",
+  "info": {
+    "displayName": "Prosessi (tie)",
+    "icon": "walk"
+  },
+  "options": {},
+  "attributes": {
+    "eyebrow": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "steps": {
+      "type": "component",
+      "component": "shared.step",
+      "repeatable": true
+    }
+  }
+}
