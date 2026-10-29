@@ -3,7 +3,7 @@ import type { Schema, Struct } from '@strapi/strapi';
 export interface SectionsAboutHero extends Struct.ComponentSchema {
   collectionName: 'components_sections_about_heros';
   info: {
-    displayName: 'Meist\u00E4 \u2013 hero';
+    displayName: 'Meist\u00E4 \u2013 hero (About \u2013 hero)';
     icon: 'emotionHappy';
   };
   attributes: {
@@ -20,7 +20,7 @@ export interface SectionsAboutHero extends Struct.ComponentSchema {
 export interface SectionsBrandTicker extends Struct.ComponentSchema {
   collectionName: 'components_sections_brand_tickers';
   info: {
-    displayName: 'Merkkinauha';
+    displayName: 'Merkkinauha (Brand ticker)';
     icon: 'slideshow';
   };
   attributes: {
@@ -32,7 +32,7 @@ export interface SectionsBrandTicker extends Struct.ComponentSchema {
 export interface SectionsContactHub extends Struct.ComponentSchema {
   collectionName: 'components_sections_contact_hubs';
   info: {
-    displayName: 'Yhteydenotto';
+    displayName: 'Yhteydenotto (Contact hub)';
     icon: 'message';
   };
   attributes: {
@@ -50,7 +50,7 @@ export interface SectionsContactHub extends Struct.ComponentSchema {
 export interface SectionsCtaBanner extends Struct.ComponentSchema {
   collectionName: 'components_sections_cta_banners';
   info: {
-    displayName: 'CTA-banneri';
+    displayName: 'CTA-banneri (CTA banner)';
     icon: 'cursor';
   };
   attributes: {
@@ -66,7 +66,7 @@ export interface SectionsCtaBanner extends Struct.ComponentSchema {
 export interface SectionsFaq extends Struct.ComponentSchema {
   collectionName: 'components_sections_faqs';
   info: {
-    displayName: 'UKK';
+    displayName: 'UKK (FAQ)';
     icon: 'question';
   };
   attributes: {
@@ -79,7 +79,7 @@ export interface SectionsFaq extends Struct.ComponentSchema {
 export interface SectionsFinanceTeaser extends Struct.ComponentSchema {
   collectionName: 'components_sections_finance_teasers';
   info: {
-    displayName: 'Rahoitusnosto';
+    displayName: 'Rahoitusnosto (Finance teaser)';
     icon: 'chartPie';
   };
   attributes: {
@@ -96,7 +96,7 @@ export interface SectionsFinanceTeaser extends Struct.ComponentSchema {
 export interface SectionsHeroShowroom extends Struct.ComponentSchema {
   collectionName: 'components_sections_hero_showrooms';
   info: {
-    displayName: 'Hero \u2013 n\u00E4yttelytila';
+    displayName: 'Hero \u2013 n\u00E4yttelytila (Hero \u2013 showroom)';
     icon: 'landscape';
   };
   attributes: {
@@ -118,7 +118,7 @@ export interface SectionsHeroShowroom extends Struct.ComponentSchema {
 export interface SectionsImageBand extends Struct.ComponentSchema {
   collectionName: 'components_sections_image_bands';
   info: {
-    displayName: 'Kuvanauha';
+    displayName: 'Kuvanauha (Image band)';
     icon: 'picture';
   };
   attributes: {
@@ -134,7 +134,7 @@ export interface SectionsImageBand extends Struct.ComponentSchema {
 export interface SectionsInventoryBrowser extends Struct.ComponentSchema {
   collectionName: 'components_sections_inventory_browsers';
   info: {
-    displayName: 'Autolistaus + suodatus';
+    displayName: 'Autolistaus + suodatus (Inventory browser)';
     icon: 'filter';
   };
   attributes: {
@@ -148,7 +148,7 @@ export interface SectionsInventoryBrowser extends Struct.ComponentSchema {
 export interface SectionsLatestCars extends Struct.ComponentSchema {
   collectionName: 'components_sections_latest_carss';
   info: {
-    displayName: 'Uusimmat autot';
+    displayName: 'Uusimmat autot (Latest cars)';
     icon: 'car';
   };
   attributes: {
@@ -171,7 +171,7 @@ export interface SectionsLatestCars extends Struct.ComponentSchema {
 export interface SectionsPageHeader extends Struct.ComponentSchema {
   collectionName: 'components_sections_page_headers';
   info: {
-    displayName: 'Sivun otsikko';
+    displayName: 'Sivun otsikko (Page header)';
     icon: 'heading';
   };
   attributes: {
@@ -186,7 +186,7 @@ export interface SectionsPageHeader extends Struct.ComponentSchema {
 export interface SectionsProcessRoad extends Struct.ComponentSchema {
   collectionName: 'components_sections_process_roads';
   info: {
-    displayName: 'Prosessi (tie)';
+    displayName: 'Prosessi \u2013 tie (Process road)';
     icon: 'walk';
   };
   attributes: {
@@ -199,7 +199,7 @@ export interface SectionsProcessRoad extends Struct.ComponentSchema {
 export interface SectionsQuickSearch extends Struct.ComponentSchema {
   collectionName: 'components_sections_quick_searchs';
   info: {
-    displayName: 'Pikahaku';
+    displayName: 'Pikahaku (Quick search)';
     icon: 'search';
   };
   attributes: {
@@ -213,7 +213,7 @@ export interface SectionsQuickSearch extends Struct.ComponentSchema {
 export interface SectionsRichText extends Struct.ComponentSchema {
   collectionName: 'components_sections_rich_texts';
   info: {
-    displayName: 'Vapaa teksti';
+    displayName: 'Vapaa teksti (Rich text)';
     icon: 'medium';
   };
   attributes: {
@@ -225,7 +225,7 @@ export interface SectionsRichText extends Struct.ComponentSchema {
 export interface SectionsServicesDetail extends Struct.ComponentSchema {
   collectionName: 'components_sections_services_details';
   info: {
-    displayName: 'Palvelut (kaikki)';
+    displayName: 'Palvelut \u2013 kaikki (Services \u2013 all)';
     icon: 'layer';
   };
   attributes: {
@@ -237,7 +237,7 @@ export interface SectionsServicesDetail extends Struct.ComponentSchema {
 export interface SectionsServicesList extends Struct.ComponentSchema {
   collectionName: 'components_sections_services_lists';
   info: {
-    displayName: 'Palvelulista';
+    displayName: 'Palvelulista (Services list)';
     icon: 'bulletList';
   };
   attributes: {
@@ -252,7 +252,7 @@ export interface SectionsServicesList extends Struct.ComponentSchema {
 export interface SectionsStatement extends Struct.ComponentSchema {
   collectionName: 'components_sections_statements';
   info: {
-    displayName: 'Iskulause';
+    displayName: 'Iskulause (Statement)';
     icon: 'quote';
   };
   attributes: {
@@ -267,7 +267,7 @@ export interface SectionsStatement extends Struct.ComponentSchema {
 export interface SectionsTeam extends Struct.ComponentSchema {
   collectionName: 'components_sections_teams';
   info: {
-    displayName: 'Tiimi';
+    displayName: 'Tiimi (Team)';
     icon: 'user';
   };
   attributes: {
@@ -280,7 +280,7 @@ export interface SectionsTeam extends Struct.ComponentSchema {
 export interface SectionsValuesList extends Struct.ComponentSchema {
   collectionName: 'components_sections_values_lists';
   info: {
-    displayName: 'Arvot';
+    displayName: 'Arvot (Values)';
     icon: 'star';
   };
   attributes: {
@@ -294,7 +294,7 @@ export interface SectionsValuesList extends Struct.ComponentSchema {
 export interface SectionsVehicleTypesGrid extends Struct.ComponentSchema {
   collectionName: 'components_sections_vehicle_types_grids';
   info: {
-    displayName: 'Ajoneuvotyypit';
+    displayName: 'Ajoneuvotyypit (Vehicle types)';
     icon: 'apps';
   };
   attributes: {
@@ -308,7 +308,7 @@ export interface SectionsVehicleTypesGrid extends Struct.ComponentSchema {
 export interface SectionsVisitCta extends Struct.ComponentSchema {
   collectionName: 'components_sections_visit_ctas';
   info: {
-    displayName: 'Tervetuloa k\u00E4ym\u00E4\u00E4n';
+    displayName: 'Tervetuloa k\u00E4ym\u00E4\u00E4n (Visit CTA)';
     icon: 'pinMap';
   };
   attributes: {
@@ -323,7 +323,7 @@ export interface SectionsVisitCta extends Struct.ComponentSchema {
 export interface SharedFaqItem extends Struct.ComponentSchema {
   collectionName: 'components_shared_faq_items';
   info: {
-    displayName: 'UKK-kysymys / FAQ item';
+    displayName: 'UKK-kysymys (FAQ item)';
     icon: 'question';
   };
   attributes: {
@@ -335,7 +335,7 @@ export interface SharedFaqItem extends Struct.ComponentSchema {
 export interface SharedKeyValue extends Struct.ComponentSchema {
   collectionName: 'components_shared_key_values';
   info: {
-    displayName: 'Tieto / Key-value';
+    displayName: 'Tieto (Key-value)';
     icon: 'bulletList';
   };
   attributes: {
@@ -347,7 +347,7 @@ export interface SharedKeyValue extends Struct.ComponentSchema {
 export interface SharedLink extends Struct.ComponentSchema {
   collectionName: 'components_shared_links';
   info: {
-    displayName: 'Linkki / Link';
+    displayName: 'Linkki (Link)';
     icon: 'link';
   };
   attributes: {
@@ -360,7 +360,7 @@ export interface SharedLink extends Struct.ComponentSchema {
 export interface SharedOpeningHour extends Struct.ComponentSchema {
   collectionName: 'components_shared_opening_hours';
   info: {
-    displayName: 'Aukioloaika / Opening hour';
+    displayName: 'Aukioloaika (Opening hour)';
     icon: 'clock';
   };
   attributes: {
@@ -383,7 +383,7 @@ export interface SharedOpeningHour extends Struct.ComponentSchema {
 export interface SharedOption extends Struct.ComponentSchema {
   collectionName: 'components_shared_options';
   info: {
-    displayName: 'Valinta / Option';
+    displayName: 'Valinta (Option)';
     icon: 'bulletList';
   };
   attributes: {
@@ -413,7 +413,7 @@ export interface SharedSeo extends Struct.ComponentSchema {
 export interface SharedServiceRow extends Struct.ComponentSchema {
   collectionName: 'components_shared_service_rows';
   info: {
-    displayName: 'Palvelurivi / Service row';
+    displayName: 'Palvelurivi (Service row)';
     icon: 'bulletList';
   };
   attributes: {
@@ -426,7 +426,7 @@ export interface SharedServiceRow extends Struct.ComponentSchema {
 export interface SharedStep extends Struct.ComponentSchema {
   collectionName: 'components_shared_steps';
   info: {
-    displayName: 'Vaihe / Step';
+    displayName: 'Vaihe (Step)';
     icon: 'arrowRight';
   };
   attributes: {
@@ -438,7 +438,7 @@ export interface SharedStep extends Struct.ComponentSchema {
 export interface SharedTeamMember extends Struct.ComponentSchema {
   collectionName: 'components_shared_team_members';
   info: {
-    displayName: 'Tiimil\u00E4inen / Team member';
+    displayName: 'Tiimil\u00E4inen (Team member)';
     icon: 'user';
   };
   attributes: {
@@ -457,7 +457,7 @@ export interface SharedTeamMember extends Struct.ComponentSchema {
 export interface SharedValueItem extends Struct.ComponentSchema {
   collectionName: 'components_shared_value_items';
   info: {
-    displayName: 'Arvo / Value';
+    displayName: 'Arvo (Value)';
     icon: 'star';
   };
   attributes: {

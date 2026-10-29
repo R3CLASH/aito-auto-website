@@ -1,7 +1,7 @@
 {
   "collectionName": "components_sections_page_headers",
   "info": {
-    "displayName": "Sivun otsikko",
+    "displayName": "Sivun otsikko (Page header)",
     "icon": "heading"
   },
   "options": {},

@@ -1,7 +1,7 @@
 {
   "collectionName": "components_shared_opening_hours",
   "info": {
-    "displayName": "Aukioloaika / Opening hour",
+    "displayName": "Aukioloaika (Opening hour)",
     "icon": "clock"
   },
   "options": {},

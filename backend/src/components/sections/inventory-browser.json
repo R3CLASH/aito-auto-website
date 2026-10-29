@@ -1,7 +1,7 @@
 {
   "collectionName": "components_sections_inventory_browsers",
   "info": {
-    "displayName": "Autolistaus + suodatus",
+    "displayName": "Autolistaus + suodatus (Inventory browser)",
     "icon": "filter"
   },
   "options": {},
