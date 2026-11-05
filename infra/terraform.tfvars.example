@@ -1,0 +1,23 @@
+# Copy to terraform.tfvars and fill in. terraform.tfvars is gitignored.
+
+aws_profile = "thavisha"
+aws_region  = "eu-north-1"
+
+# Public hostnames.
+site_domain = "aitoauto.fi"
+cms_domain  = "cms.aitoauto.fi"
+
+# Route 53 hosted zone that owns both names. Leave empty to manage DNS
+# elsewhere -- Terraform then outputs the records you need to create.
+route53_zone_id = ""
+
+# --- Cost dials -------------------------------------------------------------
+# single_nat_gateway = true saves ~35 USD/month over one NAT per AZ.
+single_nat_gateway = true
+
+# db.t4g.micro is free-tier eligible for the first 12 months.
+db_instance_class = "db.t4g.micro"
+db_multi_az       = false
+
+cms_cpu    = 512
+cms_memory = 1024
