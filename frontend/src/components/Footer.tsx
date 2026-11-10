@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { GlobalSettings } from '@/lib/types';
 import { telHref } from '@/lib/format';
+import { SocialIcon } from './Icons';
 
 export default function Footer({ global }: { global: GlobalSettings }) {
   const year = new Date().getFullYear();
@@ -14,6 +15,15 @@ export default function Footer({ global }: { global: GlobalSettings }) {
               {global.logo ? <Image src={global.logo.url} alt={global.siteName} width={global.logo.width} height={global.logo.height} sizes="110px" /> : <span className="d" style={{ fontSize: 32, color: '#fff' }}>{global.siteName}</span>}
             </Link>
             {global.footerTagline ? <p>{global.footerTagline}</p> : null}
+            {global.socials.length ? (
+              <nav className="soc ft-soc" aria-label="Sosiaalinen media">
+                {global.socials.map((s) => (
+                  <a key={s.key} href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.label} title={s.label}>
+                    <SocialIcon name={s.key} />
+                  </a>
+                ))}
+              </nav>
+            ) : null}
           </div>
           <div>
             <div className="ft-h">Sivut</div>

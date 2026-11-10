@@ -688,6 +688,49 @@ export interface ApiCarCar extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiEmailInquiryEmailInquiry
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'email_inquiries';
+  info: {
+    displayName: 'S\u00E4hk\u00F6postikysely (Email inquiry)';
+    pluralName: 'email-inquiries';
+    singularName: 'email-inquiry';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    calculation: Schema.Attribute.JSON;
+    car: Schema.Attribute.Relation<'manyToOne', 'api::car.car'>;
+    carTitle: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email & Schema.Attribute.Required;
+    internalNotes: Schema.Attribute.Text;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::email-inquiry.email-inquiry'
+    > &
+      Schema.Attribute.Private;
+    message: Schema.Attribute.Text;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    notified: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    phone: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    sourcePage: Schema.Attribute.String;
+    status: Schema.Attribute.Enumeration<['new', 'contacted', 'closed']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'new'>;
+    topic: Schema.Attribute.String;
+    tradeIn: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiFinanceSettingFinanceSetting
   extends Struct.SingleTypeSchema {
   collectionName: 'finance_settings';
@@ -752,10 +795,13 @@ export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
       Schema.Attribute.Private;
     defaultSeo: Schema.Attribute.Component<'shared.seo', false>;
     email: Schema.Attribute.Email;
+    facebookUrl: Schema.Attribute.String;
     footerLinks: Schema.Attribute.Component<'shared.link', true>;
     footerTagline: Schema.Attribute.String;
     headerCta: Schema.Attribute.Component<'shared.link', false>;
+    instagramUrl: Schema.Attribute.String;
     invoicingAddress: Schema.Attribute.String;
+    linkedinUrl: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -777,11 +823,13 @@ export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
       Schema.Attribute.DefaultTo<'Aito Auto Oy'>;
     street: Schema.Attribute.String;
     tagline: Schema.Attribute.String;
+    tiktokUrl: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     whatsappNumber: Schema.Attribute.String & Schema.Attribute.Required;
     whatsappTopics: Schema.Attribute.Component<'shared.option', true>;
+    youtubeUrl: Schema.Attribute.String;
   };
 }
 
@@ -1465,6 +1513,7 @@ declare module '@strapi/strapi' {
       'api::car-detail-page.car-detail-page': ApiCarDetailPageCarDetailPage;
       'api::car-model.car-model': ApiCarModelCarModel;
       'api::car.car': ApiCarCar;
+      'api::email-inquiry.email-inquiry': ApiEmailInquiryEmailInquiry;
       'api::finance-setting.finance-setting': ApiFinanceSettingFinanceSetting;
       'api::global.global': ApiGlobalGlobal;
       'api::lead.lead': ApiLeadLead;

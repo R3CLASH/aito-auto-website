@@ -1,6 +1,7 @@
 import type { SiteContext } from '@/lib/types';
 import { telHref } from '@/lib/format';
 import WaButton from '../WaButton';
+import { SocialIcon } from '../Icons';
 import ContactForm from './ContactForm';
 import OpenStatus, { HoursList } from './OpenStatus';
 
@@ -74,6 +75,19 @@ export default function ContactHub({ block, ctx }: { block: any; ctx: SiteContex
             <HoursList hours={g.openingHours} />
             {g.openingHoursNote ? <p className="note">{g.openingHoursNote}</p> : null}
           </div>
+
+          {g.socials.length ? (
+            <div className="company rv">
+              <div className="eyebrow" style={{ fontSize: 12, marginBottom: 10 }}>Seuraa meitä</div>
+              <nav className="soc" aria-label="Sosiaalinen media">
+                {g.socials.map((s) => (
+                  <a key={s.key} href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.label} title={s.label}>
+                    <SocialIcon name={s.key} />
+                  </a>
+                ))}
+              </nav>
+            </div>
+          ) : null}
 
           <div className="company rv">
             <div className="eyebrow" style={{ fontSize: 12, marginBottom: 8 }}>Yritystiedot</div>

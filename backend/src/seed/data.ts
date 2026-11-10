@@ -120,6 +120,12 @@ export const global = {
   city: '[Kaupunki]',
   businessId: '[0000000-0]',
   invoicingAddress: '[verkkolaskuosoite]',
+  // Placeholders: replace with the real profiles in Yleiset asetukset (Global).
+  facebookUrl: 'https://www.facebook.com/',
+  instagramUrl: 'https://www.instagram.com/',
+  youtubeUrl: 'https://www.youtube.com/',
+  tiktokUrl: 'https://www.tiktok.com/',
+  linkedinUrl: 'https://www.linkedin.com/',
   mapsUrl: 'https://maps.google.com',
   mapEmbedUrl: '',
   openingHours: [

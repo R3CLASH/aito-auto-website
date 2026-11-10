@@ -13,6 +13,9 @@ export type WaCar = {
   url?: string;
 };
 
+/** 'email' shows the same form but sends it to Strapi instead of opening WhatsApp. */
+export type Channel = 'whatsapp' | 'email';
+
 export type WaOptions = {
   topic?: string;
   car?: WaCar;
@@ -21,6 +24,7 @@ export type WaOptions = {
   calculation?: Record<string, unknown>;
   calcText?: string;
   title?: string;
+  channel?: Channel;
 };
 
 type Ctx = { open: (o?: WaOptions) => void };
@@ -40,6 +44,8 @@ export default function WhatsAppProvider({ number, topics, siteUrl, children }: 
   const [form, setForm] = useState<Form>({ name: '', phone: '', email: '', topic: topics[0] || 'Kiinnostunut autosta', carText: '', tradeIn: '', message: '', website: '' });
   const [errors, setErrors] = useState<Partial<Record<keyof Form, string>>>({});
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState('');
   const firstInput = useRef<HTMLInputElement>(null);
   const lastFocus = useRef<HTMLElement | null>(null);
 
@@ -48,6 +54,8 @@ export default function WhatsAppProvider({ number, topics, siteUrl, children }: 
     setOpts(o);
     setSent(false);
     setErrors({});
+    setSendError('');
+    setSending(false);
     setForm((f) => ({
       ...f,
       topic: o.topic || f.topic || topics[0] || 'Kiinnostunut autosta',
@@ -99,31 +107,63 @@ export default function WhatsAppProvider({ number, topics, siteUrl, children }: 
 
   const href = waLink(number, message);
 
-  const onSend = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const validate = (emailRequired: boolean) => {
     const errs: typeof errors = {};
     if (!form.name.trim()) errs.name = 'Kirjoita nimesi';
     if (form.phone.replace(/\D/g, '').length < 6) errs.phone = 'Tarkista puhelinnumero';
-    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = 'Tarkista sähköposti';
+    if (emailRequired && !form.email.trim()) errs.email = 'Kirjoita sähköpostiosoitteesi';
+    else if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = 'Tarkista sähköposti';
     setErrors(errs);
-    if (Object.keys(errs).length) { e.preventDefault(); return; }
+    return !Object.keys(errs).length;
+  };
+
+  const payload = (channel: Channel) => ({
+    channel,
+    name: form.name, phone: form.phone, email: form.email, topic: form.topic,
+    message: form.message, tradeIn: form.tradeIn,
+    carTitle: opts?.car?.title || form.carText,
+    carDocumentId: opts?.car?.documentId,
+    calculation: opts?.calculation,
+    sourcePage: pathname,
+    website: form.website,
+  });
+
+  const onSend = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!validate(false)) { e.preventDefault(); return; }
 
     // Save the lead in Strapi in the background; WhatsApp opens through the link itself.
     fetch('/api/leads', {
       method: 'POST',
       keepalive: true,
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        channel: 'whatsapp',
-        name: form.name, phone: form.phone, email: form.email, topic: form.topic,
-        message: form.message, tradeIn: form.tradeIn,
-        carTitle: opts?.car?.title || form.carText,
-        carDocumentId: opts?.car?.documentId,
-        calculation: opts?.calculation,
-        sourcePage: pathname,
-        website: form.website,
-      }),
+      body: JSON.stringify(payload('whatsapp')),
     }).catch(() => {});
     setSent(true);
+  };
+
+  // Email inquiries land in their own Strapi collection, so wait for the result
+  // and keep the filled form on screen if it fails.
+  const onSendEmail = async () => {
+    if (!validate(true)) return;
+    setSending(true);
+    setSendError('');
+    try {
+      const res = await fetch('/api/inquiries', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload('email')),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setSendError(data?.error || 'Lähetys epäonnistui. Yritä hetken päästä uudelleen.');
+        return;
+      }
+      setSent(true);
+    } catch {
+      setSendError('Palvelin ei vastaa juuri nyt. Yritä hetken päästä uudelleen.');
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -141,9 +181,13 @@ export default function WhatsAppProvider({ number, topics, siteUrl, children }: 
             <div className="modal-head">
               <div>
                 <div>
-                  <div className="m">WHATSAPP</div>
+                  <div className="m">{opts.channel === 'email' ? 'SÄHKÖPOSTI' : 'WHATSAPP'}</div>
                   <h2 id="wa-title" className="d">{opts.title || (opts.car ? 'Kysy tästä autosta' : 'Lähetä meille viesti')}</h2>
-                  <p>{opts.car ? 'Auton tiedot tulevat viestiin automaattisesti.' : 'Täytä tiedot – vastaamme aukioloaikoina.'}</p>
+                  <p>
+                    {opts.channel === 'email'
+                      ? 'Lähetä viesti suoraan sivulta – vastaamme sähköpostilla.'
+                      : opts.car ? 'Auton tiedot tulevat viestiin automaattisesti.' : 'Täytä tiedot – vastaamme aukioloaikoina.'}
+                  </p>
                 </div>
                 <button type="button" className="x-btn" aria-label="Sulje" onClick={close}><Close /></button>
               </div>
@@ -163,10 +207,14 @@ export default function WhatsAppProvider({ number, topics, siteUrl, children }: 
               <div className="modal-body" style={{ textAlign: 'center', padding: '40px 22px' }}>
                 <div className="d" style={{ fontSize: 64, color: 'var(--azure)' }}>Kiitos!</div>
                 <p style={{ margin: '12px auto 22px', maxWidth: 380, color: 'var(--body)', lineHeight: 1.55 }}>
-                  WhatsApp avautui uuteen ikkunaan valmiin viestin kanssa. Paina siellä vielä lähetä, niin vastaamme pian.
+                  {opts.channel === 'email'
+                    ? 'Viestisi on lähetetty. Olemme sinuun yhteydessä sähköpostilla mahdollisimman pian.'
+                    : 'WhatsApp avautui uuteen ikkunaan valmiin viestin kanssa. Paina siellä vielä lähetä, niin vastaamme pian.'}
                 </p>
                 <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
-                  <a className="btn btn-wa" href={href} target="_blank" rel="noopener noreferrer">Avaa WhatsApp uudelleen</a>
+                  {opts.channel === 'email' ? null : (
+                    <a className="btn btn-wa" href={href} target="_blank" rel="noopener noreferrer">Avaa WhatsApp uudelleen</a>
+                  )}
                   <button className="btn btn-outline" type="button" onClick={close}>Sulje</button>
                 </div>
               </div>
@@ -180,7 +228,7 @@ export default function WhatsAppProvider({ number, topics, siteUrl, children }: 
                   <input type="tel" autoComplete="tel" value={form.phone} onChange={set('phone')} />
                   {errors.phone ? <span className="err">{errors.phone}</span> : null}
                 </label>
-                <label className={`field ${errors.email ? 'invalid' : ''}`}>Sähköposti
+                <label className={`field ${errors.email ? 'invalid' : ''}`}>Sähköposti{opts.channel === 'email' ? ' *' : ''}
                   <input type="email" autoComplete="email" value={form.email} onChange={set('email')} />
                   {errors.email ? <span className="err">{errors.email}</span> : null}
                 </label>
@@ -203,12 +251,26 @@ export default function WhatsAppProvider({ number, topics, siteUrl, children }: 
                   <textarea rows={4} value={form.message} onChange={set('message')} />
                 </label>
                 <label className="hp" aria-hidden="true">Website<input tabIndex={-1} autoComplete="off" value={form.website} onChange={set('website')} /></label>
-                <a className="btn btn-wa btn-lg full" href={href} target="_blank" rel="noopener noreferrer" onClick={onSend}>
-                  Avaa WhatsApp ja lähetä <Arrow />
-                </a>
-                <p className="fine full">
-                  Viesti avautuu WhatsAppiin valmiiksi täytettynä – kaikki tiedot tulevat meille yhdellä kertaa. Käsittelemme tietoja <a href="/tietosuojaseloste">tietosuojaselosteen</a> mukaisesti.
-                </p>
+                {opts.channel === 'email' ? (
+                  <>
+                    {sendError ? <p className="form-error full">{sendError}</p> : null}
+                    <button className="btn btn-navy btn-lg full" type="button" disabled={sending} onClick={onSendEmail}>
+                      {sending ? 'Lähetetään…' : <>Lähetä viesti <Arrow /></>}
+                    </button>
+                    <p className="fine full">
+                      Viesti lähtee suoraan myynnille – WhatsAppia ei tarvita. Käsittelemme tietoja <a href="/tietosuojaseloste">tietosuojaselosteen</a> mukaisesti.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <a className="btn btn-wa btn-lg full" href={href} target="_blank" rel="noopener noreferrer" onClick={onSend}>
+                      Avaa WhatsApp ja lähetä <Arrow />
+                    </a>
+                    <p className="fine full">
+                      Viesti avautuu WhatsAppiin valmiiksi täytettynä – kaikki tiedot tulevat meille yhdellä kertaa. Käsittelemme tietoja <a href="/tietosuojaseloste">tietosuojaselosteen</a> mukaisesti.
+                    </p>
+                  </>
+                )}
               </div>
             )}
           </div>

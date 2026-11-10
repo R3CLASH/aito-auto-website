@@ -1,0 +1,67 @@
+{
+  "kind": "collectionType",
+  "collectionName": "email_inquiries",
+  "info": {
+    "singularName": "email-inquiry",
+    "pluralName": "email-inquiries",
+    "displayName": "Sähköpostikysely (Email inquiry)"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "phone": {
+      "type": "string",
+      "required": true
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "topic": {
+      "type": "string"
+    },
+    "message": {
+      "type": "text"
+    },
+    "carTitle": {
+      "type": "string"
+    },
+    "car": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::car.car"
+    },
+    "tradeIn": {
+      "type": "string"
+    },
+    "calculation": {
+      "type": "json"
+    },
+    "sourcePage": {
+      "type": "string"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "new",
+        "contacted",
+        "closed"
+      ],
+      "default": "new",
+      "required": true
+    },
+    "notified": {
+      "type": "boolean",
+      "default": false
+    },
+    "internalNotes": {
+      "type": "text"
+    }
+  }
+}

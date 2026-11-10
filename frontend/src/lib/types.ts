@@ -4,6 +4,9 @@ export type Seo = { metaTitle?: string; metaDescription?: string; shareImage?: M
 
 export type OpeningHour = { dayIndex: number; label: string; opens?: string; closes?: string; closed?: boolean };
 
+export type SocialKey = 'facebook' | 'instagram' | 'youtube' | 'tiktok' | 'linkedin';
+export type SocialLink = { key: SocialKey; label: string; url: string };
+
 export type GlobalSettings = {
   siteName: string;
   tagline: string;
@@ -17,6 +20,7 @@ export type GlobalSettings = {
   city: string;
   businessId: string;
   invoicingAddress: string;
+  socials: SocialLink[];
   mapsUrl: string;
   mapEmbedUrl: string;
   openingHours: OpeningHour[];

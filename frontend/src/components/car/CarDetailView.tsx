@@ -103,7 +103,7 @@ export default function CarDetailView({ car, tpl, ctx, templateBlocks }: {
               ) : null}
             </div>
             {car.sold ? <div className="sold-note">Tämä auto on myyty.</div> : null}
-            <CarActions car={waCar} email={ctx.global.email} sold={car.sold} />
+            <CarActions car={waCar} sold={car.sold} />
             {(car.highlights.length || tpl.trustBadges.length) ? (
               <div className="trust">
                 {[...car.highlights, ...tpl.trustBadges].map((t) => <span key={t}>{t}</span>)}

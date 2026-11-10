@@ -361,6 +361,19 @@ h1, h2, h3, p { margin: 0; }
 .ft-addr { line-height: 1.8; }
 .ft-addr a { color: #fff; text-decoration: none; }
 .ft-hours { font: 14px/1.9 var(--f-mono); }
+/* Social links: light surfaces by default, inverted inside the footer */
+.soc { display: flex; flex-wrap: wrap; gap: 8px; }
+.soc a {
+  width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--line-2); color: var(--navy); background: #fff;
+  transition: background .2s, border-color .2s, color .2s, transform .25s var(--ease);
+}
+.soc a:hover { background: var(--navy); border-color: var(--navy); color: #fff; transform: translateY(-2px); }
+.soc a:focus-visible { outline: none; border-color: var(--azure); box-shadow: 0 0 0 3px rgba(26, 126, 182, .25); }
+.ft-soc { margin-top: 18px; }
+.ft-soc a { background: transparent; border-color: #2c4262; color: #b9c6d6; }
+.ft-soc a:hover { background: var(--azure); border-color: var(--azure); color: #fff; }
+
 .ft-word { margin-top: 48px; font-size: clamp(64px, 15vw, 230px); color: transparent; -webkit-text-stroke: 1.2px #2c4262; white-space: nowrap; line-height: .8; }
 .ft-bottom { margin-top: 28px; padding-top: 20px; border-top: 1px solid #23344e; display: flex; flex-wrap: wrap; gap: 10px 24px; justify-content: space-between; font-size: 13px; }
 .ft-bottom a { color: #b9c6d6; }
@@ -425,7 +438,8 @@ h1, h2, h3, p { margin: 0; }
 
 .strip { position: sticky; top: var(--hd); z-index: 20; background: #fff; border-bottom: 2px solid var(--navy); box-shadow: 0 14px 24px -20px rgba(15,27,43,.5); }
 .strip .wrap { padding-top: 6px; padding-bottom: 6px; position: relative; }
-.spine { position: absolute; left: 41px; top: 26px; bottom: 26px; width: 2px; background: repeating-linear-gradient(180deg, var(--line-2) 0 6px, transparent 6px 11px); }
+/* Offsets are relative to .fpanel, so `left` is half the .sg diamond's width. */
+.spine { position: absolute; left: 17px; top: 26px; bottom: 26px; width: 2px; background: repeating-linear-gradient(180deg, var(--line-2) 0 6px, transparent 6px 11px); }
 .frow { display: grid; grid-template-columns: 118px minmax(0, 1fr); gap: 16px; align-items: center; min-height: 58px; position: relative; }
 .frow + .frow { border-top: 1px dashed var(--line-2); }
 .rl { display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; }
@@ -464,6 +478,35 @@ h1, h2, h3, p { margin: 0; }
 .pchip[aria-pressed='true'] i { background: var(--navy); }
 .pchip[aria-pressed='true'] sup { color: #e6f1f8; }
 .hint { font: 12px var(--f-mono); color: var(--muted); white-space: nowrap; padding: 12px 0; }
+
+/* Basic / advanced search tabs inside the filter strip */
+.ftabs { display: flex; gap: 2px; border-bottom: 1px dashed var(--line-2); }
+.ftab {
+  appearance: none; border: 0; background: transparent; cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+  min-height: 44px; padding: 0 16px; border-bottom: 2px solid transparent; color: var(--muted);
+  font: 11px var(--f-mono); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap;
+  transition: color .2s, border-color .2s, background .2s;
+}
+.ftab:hover { color: var(--ink); }
+.ftab[aria-selected='true'] { color: var(--navy); border-bottom-color: var(--azure); background: linear-gradient(180deg, transparent, rgba(26, 126, 182, .08)); }
+.ftab sup {
+  font: 500 10px var(--f-mono); color: #fff; background: var(--azure); min-width: 17px; height: 17px;
+  display: inline-flex; align-items: center; justify-content: center; padding: 0 4px; margin: 0;
+}
+.fpanel { position: relative; }
+/* The collapsed filter bar is phone-only; desktop always shows the full panel. */
+.fbar { display: none; }
+/* The advanced panel is a setup form, not a quick bar -- let it scroll away. */
+.strip.adv { position: relative; top: auto; }
+.rng { flex: none; display: inline-flex; align-items: center; gap: 8px; scroll-snap-align: start; }
+.rng .cap { font: 11px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.rng .dash { color: var(--line-2); }
+.rng select {
+  font: 500 14px var(--f-body); color: var(--ink); background: #fff; border: 1.5px solid var(--line-2);
+  border-radius: 0; min-height: 42px; padding: 0 10px; cursor: pointer;
+}
+.rng select:focus { border-color: var(--azure); outline: none; box-shadow: 0 0 0 3px rgba(26, 126, 182, .25); }
+.adv-clr { flex: none; margin-left: 4px; }
 
 .res { padding-top: 22px; padding-bottom: 120px; }
 .res-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 16px; margin-bottom: 20px; }
@@ -842,11 +885,52 @@ h1, h2, h3, p { margin: 0; }
   .ph-in { padding-top: 56px; padding-bottom: 64px; }
   .ttl-in { padding-top: 20px; padding-bottom: 22px; }
   .ttl-count .d { font-size: 40px; }
-  .strip { position: relative; top: auto; }
-  .frow { grid-template-columns: 34px minmax(0, 1fr); gap: 10px; }
+  /* Phones get one sticky 46px summary line instead of the whole panel. It stays
+     pinned while closed so filtering is always a tap away; opening it releases
+     the pin so the rows can scroll. */
+  .strip { position: sticky; top: var(--hd); }
+  .strip.mob-open { position: relative; top: auto; }
+  .strip .wrap { padding-top: 0; padding-bottom: 0; }
+  .fbar {
+    display: flex; align-items: center; gap: 9px; width: 100%; min-height: 46px; padding: 0;
+    border: 0; background: transparent; cursor: pointer; text-align: left; color: var(--navy);
+  }
+  .fbar-t { font: 11px var(--f-mono); letter-spacing: .1em; text-transform: uppercase; }
+  .fbar-n {
+    font: 500 10px var(--f-mono); color: #fff; background: var(--azure); min-width: 17px; height: 17px;
+    display: inline-flex; align-items: center; justify-content: center; padding: 0 4px;
+  }
+  .fbar-r { margin-left: auto; font: 600 13px var(--f-body); color: var(--muted); }
+  .fbar-c {
+    width: 8px; height: 8px; flex: none; margin-right: 2px;
+    border-right: 2px solid var(--navy); border-bottom: 2px solid var(--navy);
+    transform: translateY(-2px) rotate(45deg); transition: transform .25s var(--ease);
+  }
+  .strip.mob-open .fbar-c { transform: translateY(2px) rotate(-135deg); }
+  /* Closed: the tabs and every filter row fold away. */
+  .strip:not(.mob-open) .ftabs,
+  .strip:not(.mob-open) .fpanel { display: none; }
+  .strip.mob-open .ftabs { margin-top: 2px; }
+  .strip.mob-open .wrap { padding-bottom: 4px; }
+  .frow { grid-template-columns: 26px minmax(0, 1fr); gap: 8px; min-height: 0; }
   .rl .t { display: none; }
-  .spine { left: 32px; }
-  .lane { margin-right: -16px; padding-right: 16px; }
+  .sg { width: 26px; height: 26px; font-size: 13px; }
+  .spine { left: 13px; top: 15px; bottom: 15px; }
+  .lane { gap: 6px; padding: 4px 2px; margin-right: -16px; padding-right: 16px; }
+  .chip { min-height: 36px; padding: 0 11px; font-size: 13px; gap: 6px; }
+  .chip .ci { height: 15px; width: 40px; }
+  .chip sup, .pchip sup { font-size: 9px; margin-top: 7px; }
+  .pchip { min-height: 36px; }
+  .pchip i { font-size: 7px; padding: 0 4px 4px; }
+  .pchip b { font-size: 16px; padding: 0 3px 0 8px; }
+  .pchip sup { padding-right: 8px; }
+  .ftab { min-height: 38px; padding: 0 10px; font-size: 10px; letter-spacing: .05em; gap: 6px; }
+  .ftab sup { min-width: 15px; height: 15px; font-size: 9px; }
+  .rng { gap: 5px; }
+  .rng .cap { font-size: 10px; letter-spacing: .03em; }
+  .rng select { min-height: 36px; font-size: 13px; padding: 0 8px; }
+  .hint { font-size: 11px; padding: 8px 0; }
+  .adv-clr { min-height: 30px; font-size: 12px; padding: 0 10px; }
   .cd-aside { padding: 20px; }
   .cd-aside h1 { font-size: 48px; }
   .plate.lg b { font-size: 32px; }

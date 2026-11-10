@@ -4,7 +4,7 @@ import { cache } from 'react';
 import { monthlyPayment } from './finance';
 import type {
   BrandNode, CarDetail, CarSummary, Catalog, FinanceSettings, GlobalSettings, Media,
-  PageData, ServiceItem, VehicleType, CarDetailTemplate,
+  PageData, ServiceItem, SocialLink, VehicleType, CarDetailTemplate,
 } from './types';
 
 const STRAPI_URL = (process.env.STRAPI_URL || 'http://localhost:1337').replace(/\/$/, '');
@@ -45,6 +45,18 @@ function media(m: any): Media | null {
 
 /* ------------------------------------------------------------------ singles */
 
+/** Social profiles, in a fixed display order; the ones left empty in Strapi drop out. */
+const SOCIALS: { key: SocialLink['key']; label: string; field: string }[] = [
+  { key: 'facebook', label: 'Facebook', field: 'facebookUrl' },
+  { key: 'instagram', label: 'Instagram', field: 'instagramUrl' },
+  { key: 'youtube', label: 'YouTube', field: 'youtubeUrl' },
+  { key: 'tiktok', label: 'TikTok', field: 'tiktokUrl' },
+  { key: 'linkedin', label: 'LinkedIn', field: 'linkedinUrl' },
+];
+
+const socialLinks = (g: any): SocialLink[] =>
+  SOCIALS.map(({ key, label, field }) => ({ key, label, url: (g[field] || '').trim() })).filter((s) => s.url);
+
 export const getGlobal = cache(async (): Promise<GlobalSettings> => {
   const res = await api('global', {
     populate: {
@@ -66,6 +78,7 @@ export const getGlobal = cache(async (): Promise<GlobalSettings> => {
     city: g.city || '',
     businessId: g.businessId || '',
     invoicingAddress: g.invoicingAddress || '',
+    socials: socialLinks(g),
     mapsUrl: g.mapsUrl || '',
     mapEmbedUrl: g.mapEmbedUrl || '',
     openingHours: [...(g.openingHours || [])].sort((a: any, b: any) => a.dayIndex - b.dayIndex),
