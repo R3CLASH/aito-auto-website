@@ -11,7 +11,6 @@ const extraHosts = (process.env.IMAGE_HOSTS || '')
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  output: 'standalone',
   images: {
     formats: ['image/avif', 'image/webp'],
     // Strapi local uploads are proxied through /uploads (see rewrites), so they are same-origin.

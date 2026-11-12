@@ -12,5 +12,10 @@
     "start:backend": "npm --prefix backend run start",
     "start:frontend": "npm --prefix frontend run start"
   },
-  "engines": { "node": ">=20 <=24" }
+  "engines": {
+    "node": ">=20 <=24"
+  },
+  "devDependencies": {
+    "railway": "^3.16.0"
+  }
 }
