@@ -29,14 +29,22 @@ async function api<T = any>(path: string, query: Record<string, unknown> = {}): 
   return res.json();
 }
 
-/** Turn a Strapi media object into a URL the browser can load (local uploads are proxied via /uploads). */
+/** Turn a Strapi media object into a URL the browser can load (uploads are served by app/uploads). */
 export function mediaUrl(m?: { url?: string } | null): string | null {
   if (!m?.url) return null;
-  if (m.url.startsWith('http')) {
-    // Media served by this Strapi instance → make it relative so it goes through the /uploads rewrite.
-    if (m.url.startsWith(STRAPI_URL)) return m.url.slice(STRAPI_URL.length);
-    return m.url;
+  if (!m.url.startsWith('http')) return m.url;
+
+  // Anything on an /uploads path is ours whatever host Strapi recorded it
+  // under -- the local provider writes a bare path, the bucket provider writes
+  // an absolute URL built from FRONTEND_URL. Reduce both to the same relative
+  // path so the media stays same-origin and next/image can optimise it.
+  try {
+    const { pathname, search } = new URL(m.url);
+    if (pathname.startsWith('/uploads/')) return pathname + search;
+  } catch {
+    /* not a URL we can parse; fall through and use it as given */
   }
+  if (m.url.startsWith(STRAPI_URL)) return m.url.slice(STRAPI_URL.length);
   return m.url;
 }
 

@@ -55,6 +55,35 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
   },
   upload: {
     config: {
+      // The Railway bucket when it is wired up, otherwise Strapi's own local
+      // provider so `strapi develop` needs no object storage on a laptop.
+      //
+      // The bucket is private: baseUrl points media URLs at the website, which
+      // serves them from the bucket over a signed request (see the frontend's
+      // app/uploads/[...path] route). That also keeps image traffic off this
+      // service entirely.
+      ...(env('BUCKET_NAME')
+        ? {
+            provider: 'aws-s3',
+            providerOptions: {
+              baseUrl: `${env('FRONTEND_URL', '').replace(/\/$/, '')}/uploads`,
+              s3Options: {
+                endpoint: env('BUCKET_ENDPOINT'),
+                region: env('BUCKET_REGION', 'auto'),
+                credentials: {
+                  accessKeyId: env('BUCKET_ACCESS_KEY_ID'),
+                  secretAccessKey: env('BUCKET_SECRET_ACCESS_KEY'),
+                },
+                params: {
+                  Bucket: env('BUCKET_NAME'),
+                  // Railway buckets reject canned ACLs; objects are private and
+                  // read back with a signed request.
+                  ACL: null,
+                },
+              },
+            },
+          }
+        : {}),
       security: {
         allowedTypes: allowedMediaTypes,
         deniedTypes,

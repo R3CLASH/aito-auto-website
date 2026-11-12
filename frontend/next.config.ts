@@ -1,7 +1,5 @@
 import type { NextConfig } from 'next';
 
-const STRAPI_URL = (process.env.STRAPI_URL || 'http://localhost:1337').replace(/\/$/, '');
-
 // Extra hosts for media on an external upload provider: comma-separated hostnames.
 const extraHosts = (process.env.IMAGE_HOSTS || '')
   .split(',')
@@ -13,12 +11,9 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
     formats: ['image/avif', 'image/webp'],
-    // Strapi local uploads are proxied through /uploads (see rewrites), so they are same-origin.
+    // Media is served by app/uploads/[...path], so it is same-origin.
     localPatterns: [{ pathname: '/uploads/**' }],
     remotePatterns: extraHosts.map((hostname) => ({ protocol: 'https' as const, hostname })),
-  },
-  async rewrites() {
-    return [{ source: '/uploads/:path*', destination: `${STRAPI_URL}/uploads/:path*` }];
   },
 };
 

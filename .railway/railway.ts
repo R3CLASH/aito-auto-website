@@ -1,4 +1,4 @@
-import { defineRailway, github, postgres, preserve, project, ref, service, volume } from "railway/iac";
+import { bucket, defineRailway, github, postgres, preserve, project, ref, service, volume } from "railway/iac";
 
 /**
  * Aito Auto on Railway: three resources, one GitHub repo.
@@ -22,6 +22,12 @@ const WEB_PORT = "3000";
 
 export default defineRailway(() => {
   const db = postgres("postgres");
+
+  // Media lives here rather than on the volume: the bucket survives deploys,
+  // and because the website reads it directly the CMS is never woken just to
+  // hand over an image. The volume below stays mounted as a fallback for a
+  // local-provider deploy, but nothing writes to it while the bucket is set.
+  const media = bucket("aito-media", { region: "iad" });
 
   // Strapi writes uploads to disk; a container filesystem is wiped on every
   // deploy, so the media directory needs a volume to survive.
@@ -82,6 +88,14 @@ export default defineRailway(() => {
       REVALIDATE_SECRET: preserve(),
       LEAD_FORM_SECRET: preserve(),
 
+
+      // Set with `railway variables`, never committed.
+      BUCKET_ENDPOINT: preserve(),
+      BUCKET_NAME: preserve(),
+      BUCKET_REGION: preserve(),
+      BUCKET_ACCESS_KEY_ID: preserve(),
+      BUCKET_SECRET_ACCESS_KEY: preserve(),
+
       SMTP_HOST: preserve(),
       SMTP_PORT: preserve(),
       SMTP_SECURE: preserve(),
@@ -119,10 +133,18 @@ export default defineRailway(() => {
       // Must match the CMS values.
       REVALIDATE_SECRET: preserve(),
       LEAD_FORM_SECRET: preserve(),
+
+      // Set with `railway variables`, never committed.
+      BUCKET_ENDPOINT: preserve(),
+      BUCKET_NAME: preserve(),
+      BUCKET_REGION: preserve(),
+      BUCKET_ACCESS_KEY_ID: preserve(),
+      BUCKET_SECRET_ACCESS_KEY: preserve(),
+
     },
   });
 
   return project("aito-auto", {
-    resources: [db, uploads, cms, web],
+    resources: [db, uploads, media, cms, web],
   });
 });
