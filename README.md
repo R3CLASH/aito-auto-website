@@ -55,7 +55,34 @@ Run both with a process manager (pm2/systemd) behind a reverse proxy (nginx/Cadd
 
 `REVALIDATE_SECRET` and `LEAD_FORM_SECRET` must be identical in both env files (`npm run setup` handles that). The Next.js build doesn't need Strapi running; pages render on request and cache Strapi data for 5 minutes. Every save or publish in Strapi clears that cache straight away.
 
-Uploaded images live in `backend/public/uploads`. Back up that folder together with the database, or switch Strapi to an S3/Cloudinary upload provider and list its hostname in `IMAGE_HOSTS` (frontend).
+## Deployment (Railway)
+
+The site runs on Railway as three services in the `aito-auto` project, defined
+as code in [`.railway/railway.ts`](.railway/railway.ts):
+
+| Service | Source | Notes |
+|---|---|---|
+| `web` | `frontend/` on `main` | Next.js on :3000, public domain |
+| `cms` | `backend/` on `main` | Strapi on :1337, uploads on a persistent volume |
+| `postgres` | managed | shared by both through the private network |
+
+Both services redeploy automatically on every push to `main`. The frontend
+reaches Strapi over the private network (`cms.railway.internal`), so the CMS
+never has to be public for the site to work, and `/uploads/*` is proxied
+through Next (see `frontend/next.config.ts`).
+
+To change the infrastructure, edit `.railway/railway.ts` and run:
+
+```bash
+npx railway config plan     # review the diff
+npx railway config apply    # apply it
+```
+
+Secrets (`APP_KEYS`, `JWT_SECRET`, SMTP credentials, …) are marked `preserve()`
+in that file: they are set in the Railway dashboard and never overwritten by an
+apply.
+
+Uploaded images live in `backend/public/uploads`. Back up that folder together with the database, or switch Strapi to an external upload provider and list its hostname in `IMAGE_HOSTS` (frontend).
 
 ---
 

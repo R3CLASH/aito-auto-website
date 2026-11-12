@@ -2,7 +2,7 @@ import type { NextConfig } from 'next';
 
 const STRAPI_URL = (process.env.STRAPI_URL || 'http://localhost:1337').replace(/\/$/, '');
 
-// Extra hosts for media on an external provider (S3, Cloudinary…): comma-separated hostnames.
+// Extra hosts for media on an external upload provider: comma-separated hostnames.
 const extraHosts = (process.env.IMAGE_HOSTS || '')
   .split(',')
   .map((h) => h.trim())

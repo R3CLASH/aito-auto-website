@@ -3,7 +3,7 @@ import { defineRailway, github, postgres, preserve, project, ref, service, volum
 /**
  * Aito Auto on Railway: three resources, one GitHub repo.
  *
- *   postgres  – managed database, replaces the AWS RDS instance
+ *   postgres  – managed database for the CMS
  *   cms       – Strapi, builds from backend/
  *   web       – Next.js site, builds from frontend/
  *
@@ -35,11 +35,22 @@ export default defineRailway(() => {
       watchPatterns: ["backend/**"],
     },
     deploy: {
-      startCommand: "npm run start",
+      // The heap cap goes in the start command, not NODE_OPTIONS: a service-wide
+      // variable would also apply while the admin bundle is built, and that build
+      // needs far more memory than the running server does.
+      startCommand: "NODE_OPTIONS=--max-old-space-size=320 npm run start",
       restartPolicyType: "ON_FAILURE",
+      // Strapi is only needed when an editor is in /admin or the website misses
+      // its cache, so it stops consuming memory in between. Keep the frontend's
+      // revalidate window long (see frontend/src/lib/strapi.ts) or the site will
+      // poll the CMS awake again and again.
+      sleepApplication: true,
     },
+    // The key is the mount path and the value is the volume itself. Naming the
+    // volume as the key instead silently produces no attachment at all, which
+    // leaves uploads on the container filesystem and loses them on every deploy.
     volumeMounts: {
-      "cms-uploads": { mountPath: "/app/public/uploads" },
+      "/app/public/uploads": uploads,
     },
     variables: {
       NODE_ENV: "production",
@@ -56,8 +67,10 @@ export default defineRailway(() => {
       // Where Strapi pings /api/revalidate after a content change.
       FRONTEND_URL: "https://${{web.RAILWAY_PUBLIC_DOMAIN}}",
 
-      // Never reseed demo content over real data.
-      SEED_DEMO_DATA: "false",
+      // Seeds the demo catalogue, pages and media, but only while the database
+      // is still empty (see backend/src/index.ts) -- it can never overwrite
+      // real content.
+      SEED_DEMO_DATA: "true",
 
       APP_KEYS: preserve(),
       API_TOKEN_SALT: preserve(),
@@ -86,8 +99,11 @@ export default defineRailway(() => {
       watchPatterns: ["frontend/**"],
     },
     deploy: {
-      startCommand: "npm run start",
+      startCommand: "NODE_OPTIONS=--max-old-space-size=256 npm run start",
       restartPolicyType: "ON_FAILURE",
+      // Deliberately NOT sleeping: this is the public site, and a visitor would
+      // pay the cold start.
+      sleepApplication: false,
     },
     variables: {
       NODE_ENV: "production",

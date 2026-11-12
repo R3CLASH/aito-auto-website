@@ -1,13 +1,13 @@
 # syntax=docker/dockerfile:1
 
 # ---------------------------------------------------------------------------
-# Strapi 5 production image, run on Lambda via the AWS Lambda Web Adapter.
+# Strapi 5 production image.
 #
-# The adapter turns the Lambda invoke into a normal HTTP request against the
-# server listening on $PORT, so Strapi itself stays unmodified and the same
-# image runs locally with `docker run -p 1337:1337`.
+# Railway builds the CMS with Nixpacks (see .railway/railway.ts); this file is
+# for running the same server anywhere else that takes a container.
 #
-# Build:  docker build --platform linux/amd64 -f backend/Dockerfile backend
+# Build:  docker build -f backend/Dockerfile backend
+# Run:    docker run -p 1337:1337 --env-file backend/.env <image>
 # ---------------------------------------------------------------------------
 
 FROM node:22-bookworm-slim AS build
@@ -35,18 +35,13 @@ RUN npm prune --omit=dev
 
 FROM node:22-bookworm-slim AS runtime
 
-# The adapter runs as a Lambda extension. Outside Lambda it is simply unused.
-COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.9.1 \
-     /lambda-adapter /opt/extensions/lambda-adapter
-
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libvips42 tini \
     && rm -rf /var/lib/apt/lists/*
 
 ENV NODE_ENV=production \
     HOST=0.0.0.0 \
-    PORT=1337 \
-    AWS_LWA_READINESS_CHECK_PATH=/_health
+    PORT=1337
 
 WORKDIR /app
 

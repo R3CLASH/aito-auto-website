@@ -16,7 +16,10 @@ async function api<T = any>(path: string, query: Record<string, unknown> = {}): 
   const url = `${STRAPI_URL}/api/${path}${q ? `?${q}` : ''}`;
   const res = await fetch(url, {
     headers: TOKEN ? { Authorization: `Bearer ${TOKEN}` } : undefined,
-    next: { revalidate: 300, tags: [CACHE_TAG] },
+    // One hour, not five minutes. Strapi purges this cache by tag the moment
+    // anything is published (see app/api/revalidate), so the long window costs
+    // no freshness -- it just stops the site waking the sleeping CMS 288x a day.
+    next: { revalidate: 3600, tags: [CACHE_TAG] },
   });
   if (res.status === 404) return { data: null } as T;
   if (!res.ok) {

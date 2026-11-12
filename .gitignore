@@ -2,12 +2,6 @@ node_modules
 .env
 .env.local
 
-# Terraform
-infra/.terraform/
-infra/*.tfstate
-infra/*.tfstate.*
-infra/terraform.tfvars
-infra/*.tfplan
 
 # Build artefacts
 dist/
