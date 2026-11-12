@@ -39,9 +39,12 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends libvips42 tini \
     && rm -rf /var/lib/apt/lists/*
 
+# The heap cap lives here, in the runtime stage only: the build stage above
+# bundles the admin panel and needs considerably more memory than this.
 ENV NODE_ENV=production \
     HOST=0.0.0.0 \
-    PORT=1337
+    PORT=1337 \
+    NODE_OPTIONS=--max-old-space-size=320
 
 WORKDIR /app
 

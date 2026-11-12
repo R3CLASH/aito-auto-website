@@ -35,10 +35,11 @@ export default defineRailway(() => {
       watchPatterns: ["backend/**"],
     },
     deploy: {
-      // The heap cap goes in the start command, not NODE_OPTIONS: a service-wide
-      // variable would also apply while the admin bundle is built, and that build
-      // needs far more memory than the running server does.
-      startCommand: "NODE_OPTIONS=--max-old-space-size=320 npm run start",
+      // The heap cap is set in backend/Dockerfile's runtime stage, not here: the
+      // image has an ENTRYPOINT of tini, so a start command is passed through as
+      // argv and an inline "NODE_OPTIONS=... npm run start" is never expanded by
+      // a shell -- tini just fails to exec a binary by that name.
+      startCommand: "npm run start",
       restartPolicyType: "ON_FAILURE",
       // Strapi is only needed when an editor is in /admin or the website misses
       // its cache, so it stops consuming memory in between. Keep the frontend's
