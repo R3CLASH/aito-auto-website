@@ -31,6 +31,7 @@ export default function InventoryBrowser({ block, catalog, initial }: {
   const [priceMax, setPriceMax] = useState('');
   const [yearMin, setYearMin] = useState('');
   const [yearMax, setYearMax] = useState('');
+  const [kmMin, setKmMin] = useState('');
   const [kmMax, setKmMax] = useState('');
   const [fuel, setFuel] = useState('');
   const [trans, setTrans] = useState('');
@@ -55,7 +56,7 @@ export default function InventoryBrowser({ block, catalog, initial }: {
   }, [type, brand, model]);
 
   // Narrowing the advanced filters shortens the list, so start the paging over.
-  useEffect(() => { setShown(PAGE); }, [priceMin, priceMax, yearMin, yearMax, kmMax, fuel, trans]);
+  useEffect(() => { setShown(PAGE); }, [priceMin, priceMax, yearMin, yearMax, kmMin, kmMax, fuel, trans]);
 
   const inType = useMemo(() => cars.filter((c) => !type || c.type?.slug === type), [cars, type]);
   const inBrand = useMemo(() => inType.filter((c) => !brand || c.brand.slug === brand), [inType, brand]);
@@ -63,8 +64,8 @@ export default function InventoryBrowser({ block, catalog, initial }: {
   const inRange = useMemo(() => inModel.filter((c) => (
     (!priceMin || c.price >= +priceMin) && (!priceMax || c.price <= +priceMax) &&
     (!yearMin || c.year >= +yearMin) && (!yearMax || c.year <= +yearMax) &&
-    (!kmMax || c.mileage <= +kmMax)
-  )), [inModel, priceMin, priceMax, yearMin, yearMax, kmMax]);
+    (!kmMin || c.mileage >= +kmMin) && (!kmMax || c.mileage <= +kmMax)
+  )), [inModel, priceMin, priceMax, yearMin, yearMax, kmMin, kmMax]);
 
   const result = useMemo(() => {
     const list = inRange.filter((c) => (!fuel || c.fuel === fuel) && (!trans || c.transmission === trans));
@@ -125,7 +126,7 @@ export default function InventoryBrowser({ block, catalog, initial }: {
 
   const heading = modelObj ? `${brandObj!.name} ${modelObj.name}` : brandObj ? brandObj.name : typeObj ? typeObj.name : 'Kaikki autot';
   const summary = [typeObj ? typeObj.name.toLowerCase() : 'kaikki tyypit', brandObj?.name || 'kaikki merkit', modelObj?.name || 'kaikki mallit'].join(' → ');
-  const advActive = [priceMin || priceMax, yearMin || yearMax, kmMax, fuel, trans].filter(Boolean).length;
+  const advActive = [priceMin || priceMax, yearMin || yearMax, kmMin || kmMax, fuel, trans].filter(Boolean).length;
   const hasFilter = !!(type || brand || model) || advActive > 0;
   const activeCount = [type, brand, model].filter(Boolean).length + advActive;
 
@@ -139,7 +140,8 @@ export default function InventoryBrowser({ block, catalog, initial }: {
     }
   };
   const clearAdv = () => {
-    setPriceMin(''); setPriceMax(''); setYearMin(''); setYearMax(''); setKmMax(''); setFuel(''); setTrans('');
+    setPriceMin(''); setPriceMax(''); setYearMin(''); setYearMax('');
+    setKmMin(''); setKmMax(''); setFuel(''); setTrans('');
   };
   const clearAll = () => { setType(''); setBrand(''); setModel(''); clearAdv(); };
 
@@ -274,14 +276,31 @@ export default function InventoryBrowser({ block, catalog, initial }: {
                 </div>
               </div>
               <div className="frow">
-                <div className="rl"><span className={`sg ${kmMax ? 'on' : ''}`}>3</span><span className="t">Mittarilukema</span></div>
-                <div className="lane" role="group" aria-label="Mittarilukema enintään">
-                  <button type="button" className="chip round" aria-pressed={!kmMax} onClick={() => setKmMax('')}>Kaikki<sup>{inModel.length}</sup></button>
+                <div className="rl"><span className={`sg ${kmMin || kmMax ? 'on' : ''}`}>3</span><span className="t">Mittarilukema</span></div>
+                <div className="lane" role="group" aria-label="Mittarilukema">
+                  <button type="button" className="chip round" aria-pressed={!kmMin && !kmMax} onClick={() => { setKmMin(''); setKmMax(''); }}>Kaikki<sup>{inModel.length}</sup></button>
                   {kmOpts.map((s) => (
-                    <button key={s} type="button" className="chip round" aria-pressed={kmMax === String(s)} onClick={() => setKmMax(String(s))}>
+                    <button key={s} type="button" className="chip round" aria-pressed={!kmMin && kmMax === String(s)} onClick={() => { setKmMin(''); setKmMax(String(s)); }}>
                       alle {km(s)}<sup>{inModel.filter((c) => c.mileage <= s).length}</sup>
                     </button>
                   ))}
+                  {/* The boxes write the same kmMin/kmMax the chips do, so a chip
+                      fills the max box and a typed step lights its chip back up. */}
+                  <div className="rng rng-num">
+                    <span className="cap">Oma väli</span>
+                    <input
+                      type="number" inputMode="numeric" min={0} step={1000} placeholder="min"
+                      aria-label="Mittarilukema alkaen" value={kmMin}
+                      onChange={(e) => setKmMin(e.target.value)}
+                    />
+                    <span className="dash" aria-hidden="true">–</span>
+                    <input
+                      type="number" inputMode="numeric" min={0} step={1000} placeholder="max"
+                      aria-label="Mittarilukema enintään" value={kmMax}
+                      onChange={(e) => setKmMax(e.target.value)}
+                    />
+                    <span className="cap">km</span>
+                  </div>
                 </div>
               </div>
               <div className="frow">

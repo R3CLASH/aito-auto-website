@@ -506,6 +506,17 @@ h1, h2, h3, p { margin: 0; }
   border-radius: 0; min-height: 42px; padding: 0 10px; cursor: pointer;
 }
 .rng select:focus { border-color: var(--azure); outline: none; box-shadow: 0 0 0 3px rgba(26, 126, 182, .25); }
+/* Typed range next to the preset chips. The spinners are dropped because the
+   lane scrolls horizontally on touch and the arrows steal the drag. */
+.rng-num { padding-left: 10px; margin-left: 2px; border-left: 1px dashed var(--line-2); }
+.rng-num input {
+  font: 500 14px var(--f-body); color: var(--ink); background: #fff; border: 1.5px solid var(--line-2);
+  border-radius: 0; min-height: 42px; width: 84px; padding: 0 8px; -moz-appearance: textfield;
+}
+.rng-num input::-webkit-outer-spin-button,
+.rng-num input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.rng-num input::placeholder { color: #9fb0c6; font: 11px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; }
+.rng-num input:focus { border-color: var(--azure); outline: none; box-shadow: 0 0 0 3px rgba(26, 126, 182, .25); }
 .adv-clr { flex: none; margin-left: 4px; }
 
 .res { padding-top: 22px; padding-bottom: 120px; }
@@ -929,6 +940,10 @@ h1, h2, h3, p { margin: 0; }
   .rng { gap: 5px; }
   .rng .cap { font-size: 10px; letter-spacing: .03em; }
   .rng select { min-height: 36px; font-size: 13px; padding: 0 8px; }
+  /* 16px keeps iOS from zooming the viewport when the field takes focus. */
+  .rng-num { padding-left: 8px; }
+  .rng-num input { min-height: 36px; font-size: 16px; width: 72px; padding: 0 6px; }
+  .rng-num input::placeholder { font-size: 10px; }
   .hint { font-size: 11px; padding: 8px 0; }
   .adv-clr { min-height: 30px; font-size: 12px; padding: 0 10px; }
   .cd-aside { padding: 20px; }
