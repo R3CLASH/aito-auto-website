@@ -1,50 +1,78 @@
 import type { StrapiApp } from '@strapi/strapi/admin';
 
 /**
- * Stop browser auto-translation from rewriting the admin panel.
+ * Keep browser translation (Chrome/Edge "Translate this page", the Google
+ * Translate extension) from crashing the admin panel.
  *
- * Chrome/Edge "Translate this page", the Google Translate extension and similar
- * tools replace React's text nodes with their own <font> wrappers. React still
- * holds a reference to the original node, so the next re-render throws
- * "Failed to execute 'removeChild' on 'Node': The node to be removed is not a
- * child of this node" and the whole panel falls back to the "Something went
- * wrong" screen. Marking the document as not translatable leaves the DOM to
- * React and the crash goes away.
+ * Those tools rewrite the page's text nodes, replacing them with their own
+ * <font> wrappers. React still holds a reference to the original node, so the
+ * next re-render calls removeChild() on a node that is no longer there, the
+ * browser throws "The node to be removed is not a child of this node", and the
+ * whole panel falls back to Strapi's "Something went wrong" screen — which is
+ * what happens when you click an entry in the Content Manager sidebar.
+ *
+ * Rather than blocking translation, make the two DOM calls React relies on
+ * tolerant of a node the translator has already moved: removing a node that is
+ * no longer a child becomes a no-op, and inserting before a stale reference
+ * appends instead. React carries on and the crash goes away, so the page can
+ * still be translated.
+ *
+ * This is the long-standing workaround for the React/Google Translate conflict
+ * (see facebook/react#11538). It is deliberately scoped to the admin bundle.
  */
-const disableBrowserTranslation = () => {
-  if (typeof document === 'undefined') {
+const PATCH_FLAG = '__aitoTranslationDomGuard__';
+
+const guardDomAgainstTranslation = () => {
+  if (typeof window === 'undefined' || typeof Node === 'undefined') {
     return;
   }
 
-  const html = document.documentElement;
-
-  html.setAttribute('translate', 'no');
-  html.classList.add('notranslate');
-
-  // The admin UI ships in English. Saying so explicitly stops Chrome guessing
-  // the page language from the Finnish content-type names and offering to
-  // translate it.
-  if (!html.getAttribute('lang')) {
-    html.setAttribute('lang', 'en');
+  // bootstrap() runs after this module is evaluated; only patch once.
+  const globals = window as unknown as Record<string, unknown>;
+  if (globals[PATCH_FLAG]) {
+    return;
   }
+  globals[PATCH_FLAG] = true;
 
-  if (!document.querySelector('meta[name="google"][content="notranslate"]')) {
-    const meta = document.createElement('meta');
-    meta.setAttribute('name', 'google');
-    meta.setAttribute('content', 'notranslate');
-    document.head.appendChild(meta);
-  }
+  const originalRemoveChild = Node.prototype.removeChild;
+  Node.prototype.removeChild = function patchedRemoveChild<T extends Node>(
+    this: Node,
+    child: T
+  ): T {
+    if (child.parentNode !== this) {
+      // The translator already detached it. Nothing left to remove.
+      return child;
+    }
+
+    return originalRemoveChild.call(this, child) as T;
+  };
+
+  const originalInsertBefore = Node.prototype.insertBefore;
+  Node.prototype.insertBefore = function patchedInsertBefore<T extends Node>(
+    this: Node,
+    newNode: T,
+    referenceNode: Node | null
+  ): T {
+    if (referenceNode && referenceNode.parentNode !== this) {
+      // The anchor React wanted is gone; append rather than throw.
+      return originalInsertBefore.call(this, newNode, null) as T;
+    }
+
+    return originalInsertBefore.call(this, newNode, referenceNode) as T;
+  };
 };
 
 // Runs the moment the admin bundle is evaluated, before React mounts.
-disableBrowserTranslation();
+guardDomAgainstTranslation();
 
 export default {
   config: {
-    locales: [],
+    // Strapi ships a Finnish admin UI. Switching to it under
+    // Profile -> Interface language is cleaner than translating the English one
+    // in the browser, and it leaves the DOM alone entirely.
+    locales: ['fi'],
   },
   bootstrap(_app: StrapiApp) {
-    // Re-applied after boot in case anything reset the document attributes.
-    disableBrowserTranslation();
+    guardDomAgainstTranslation();
   },
 };
