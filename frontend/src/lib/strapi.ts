@@ -158,6 +158,18 @@ async function fetchAll(path: string, query: Record<string, unknown>) {
   return out;
 }
 
+/**
+ * The monthly rate shown on cards and detail pages. A figure typed into the
+ * car's `monthlyInstallment` field is what the dealer has agreed with the
+ * finance partner, so it beats anything we can derive; without one we fall
+ * back to the annuity from the price and the finance settings.
+ */
+function monthlyOf(c: { price: number; monthlyInstallment?: number | null }, finance: FinanceSettings) {
+  return c.monthlyInstallment && c.monthlyInstallment > 0
+    ? c.monthlyInstallment
+    : Math.round(monthlyPayment(c.price, finance).monthly);
+}
+
 export function carHref(c: { slug: string; brand: { slug: string }; model: { slug: string } }) {
   return `/autot/${c.brand.slug}/${c.model.slug}/${c.slug}`;
 }
@@ -170,7 +182,7 @@ export const getCatalog = cache(async (): Promise<Catalog> => {
     fetchAll('cars', {
       sort: ['createdAt:desc'],
       filters: { saleStatus: { $ne: 'sold' } },
-      fields: ['title', 'slug', 'variant', 'price', 'year', 'mileage', 'fuel', 'transmission', 'badge', 'featured', 'saleStatus', 'vatDeductible', 'createdAt'],
+      fields: ['title', 'slug', 'variant', 'price', 'year', 'mileage', 'fuel', 'transmission', 'badge', 'featured', 'saleStatus', 'vatDeductible', 'monthlyInstallment', 'createdAt'],
       populate: {
         images: { fields: ['url', 'alternativeText', 'width', 'height'] },
         car_model: { fields: ['name', 'slug'], populate: { brand: { fields: ['name', 'slug'] } } },
@@ -210,7 +222,7 @@ export const getCatalog = cache(async (): Promise<Catalog> => {
         image: imgs[0] || null,
         placeholder: (type && silhouetteBySlug[type.slug]) || null,
         photoCount: imgs.length,
-        monthly: Math.round(monthlyPayment(c.price, finance).monthly),
+        monthly: monthlyOf(c, finance),
         href: '',
         createdAt: c.createdAt,
       };
@@ -271,7 +283,7 @@ export const getCarBySlug = cache(async (slug: string): Promise<CarDetail | null
     equipment: (c.equipment || []).map((h: any) => h.label),
     extraSpecs: c.extraSpecs || [],
     description: c.description || null,
-    monthly: Math.round(monthlyPayment(c.price, finance).monthly),
+    monthly: monthlyOf(c, finance),
     href: '',
     createdAt: c.createdAt,
   };

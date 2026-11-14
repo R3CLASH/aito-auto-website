@@ -4,18 +4,20 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import type { Catalog } from '@/lib/types';
-import { euro, km } from '@/lib/format';
+import { km } from '@/lib/format';
 import CarCard from '../CarCard';
 import { useWhatsApp } from '../WhatsAppProvider';
 
 type Sort = 'new' | 'low' | 'high' | 'km';
 type Tab = 'basic' | 'adv';
 const PAGE = 24;
-const PRICE_STEP = 2500;
 const KM_STEPS = [50000, 100000, 150000, 200000];
-
-const floorTo = (n: number, step: number) => Math.floor(n / step) * step;
-const ceilTo = (n: number, step: number) => Math.ceil(n / step) * step;
+// A fixed span, not one derived from the stock: a buyer looking for a 1998 car
+// should be able to pick that year and be told there are none, rather than find
+// the option missing. Newest first, so the common choices sit at the top.
+const YEAR_MAX = 2023;
+const YEAR_MIN = 1980;
+const YEAR_OPTS = Array.from({ length: YEAR_MAX - YEAR_MIN + 1 }, (_, i) => YEAR_MAX - i);
 
 export default function InventoryBrowser({ block, catalog, initial }: {
   block: any;
@@ -33,6 +35,8 @@ export default function InventoryBrowser({ block, catalog, initial }: {
   const [yearMax, setYearMax] = useState('');
   const [kmMin, setKmMin] = useState('');
   const [kmMax, setKmMax] = useState('');
+  const [instMin, setInstMin] = useState('');
+  const [instMax, setInstMax] = useState('');
   const [fuel, setFuel] = useState('');
   const [trans, setTrans] = useState('');
   const [sort, setSort] = useState<Sort>('new');
@@ -56,7 +60,8 @@ export default function InventoryBrowser({ block, catalog, initial }: {
   }, [type, brand, model]);
 
   // Narrowing the advanced filters shortens the list, so start the paging over.
-  useEffect(() => { setShown(PAGE); }, [priceMin, priceMax, yearMin, yearMax, kmMin, kmMax, fuel, trans]);
+  useEffect(() => { setShown(PAGE); },
+    [priceMin, priceMax, yearMin, yearMax, kmMin, kmMax, instMin, instMax, fuel, trans]);
 
   const inType = useMemo(() => cars.filter((c) => !type || c.type?.slug === type), [cars, type]);
   const inBrand = useMemo(() => inType.filter((c) => !brand || c.brand.slug === brand), [inType, brand]);
@@ -64,8 +69,9 @@ export default function InventoryBrowser({ block, catalog, initial }: {
   const inRange = useMemo(() => inModel.filter((c) => (
     (!priceMin || c.price >= +priceMin) && (!priceMax || c.price <= +priceMax) &&
     (!yearMin || c.year >= +yearMin) && (!yearMax || c.year <= +yearMax) &&
-    (!kmMin || c.mileage >= +kmMin) && (!kmMax || c.mileage <= +kmMax)
-  )), [inModel, priceMin, priceMax, yearMin, yearMax, kmMin, kmMax]);
+    (!kmMin || c.mileage >= +kmMin) && (!kmMax || c.mileage <= +kmMax) &&
+    (!instMin || c.monthly >= +instMin) && (!instMax || c.monthly <= +instMax)
+  )), [inModel, priceMin, priceMax, yearMin, yearMax, kmMin, kmMax, instMin, instMax]);
 
   const result = useMemo(() => {
     const list = inRange.filter((c) => (!fuel || c.fuel === fuel) && (!trans || c.transmission === trans));
@@ -90,21 +96,7 @@ export default function InventoryBrowser({ block, catalog, initial }: {
         .filter((m) => m.n > 0 || m.slug === model)
     : [];
 
-  // Dropdown bounds follow the stock, so the ranges never offer an empty slice.
-  const priceOpts = useMemo(() => {
-    if (!cars.length) return [];
-    const lo = floorTo(Math.min(...cars.map((c) => c.price)), PRICE_STEP);
-    const hi = ceilTo(Math.max(...cars.map((c) => c.price)), PRICE_STEP);
-    const out: number[] = [];
-    for (let p = lo; p <= hi; p += PRICE_STEP) out.push(p);
-    return out;
-  }, [cars]);
-  const yearOpts = useMemo(() => {
-    if (!cars.length) return [];
-    const lo = Math.min(...cars.map((c) => c.year));
-    const hi = Math.max(...cars.map((c) => c.year));
-    return Array.from({ length: hi - lo + 1 }, (_, i) => hi - i);
-  }, [cars]);
+  // The km presets still follow the stock, so no preset ever returns nothing.
   const kmOpts = useMemo(
     () => KM_STEPS.filter((s) => cars.some((c) => c.mileage > s) && cars.some((c) => c.mileage <= s)),
     [cars],
@@ -126,7 +118,8 @@ export default function InventoryBrowser({ block, catalog, initial }: {
 
   const heading = modelObj ? `${brandObj!.name} ${modelObj.name}` : brandObj ? brandObj.name : typeObj ? typeObj.name : 'Kaikki autot';
   const summary = [typeObj ? typeObj.name.toLowerCase() : 'kaikki tyypit', brandObj?.name || 'kaikki merkit', modelObj?.name || 'kaikki mallit'].join(' → ');
-  const advActive = [priceMin || priceMax, yearMin || yearMax, kmMin || kmMax, fuel, trans].filter(Boolean).length;
+  const advActive = [priceMin || priceMax, yearMin || yearMax, kmMin || kmMax,
+    instMin || instMax, fuel, trans].filter(Boolean).length;
   const hasFilter = !!(type || brand || model) || advActive > 0;
   const activeCount = [type, brand, model].filter(Boolean).length + advActive;
 
@@ -141,7 +134,7 @@ export default function InventoryBrowser({ block, catalog, initial }: {
   };
   const clearAdv = () => {
     setPriceMin(''); setPriceMax(''); setYearMin(''); setYearMax('');
-    setKmMin(''); setKmMax(''); setFuel(''); setTrans('');
+    setKmMin(''); setKmMax(''); setInstMin(''); setInstMax(''); setFuel(''); setTrans('');
   };
   const clearAll = () => { setType(''); setBrand(''); setModel(''); clearAdv(); };
 
@@ -242,41 +235,65 @@ export default function InventoryBrowser({ block, catalog, initial }: {
               <div className="frow">
                 <div className="rl"><span className={`sg ${priceMin || priceMax ? 'on' : ''}`}>1</span><span className="t">Hinta</span></div>
                 <div className="lane">
-                  <div className="rng">
+                  <div className="rng rng-num">
                     <span className="cap">Alkaen</span>
-                    <select aria-label="Hinta alkaen" value={priceMin} onChange={(e) => setPriceMin(e.target.value)}>
-                      <option value="">Ei rajaa</option>
-                      {priceOpts.map((p) => <option key={p} value={p}>{euro(p)}</option>)}
-                    </select>
+                    <input
+                      type="number" inputMode="numeric" min={0} step={500} placeholder="min"
+                      aria-label="Hinta alkaen" value={priceMin}
+                      onChange={(e) => setPriceMin(e.target.value)}
+                    />
                     <span className="dash" aria-hidden="true">–</span>
                     <span className="cap">Enintään</span>
-                    <select aria-label="Hinta enintään" value={priceMax} onChange={(e) => setPriceMax(e.target.value)}>
-                      <option value="">Ei rajaa</option>
-                      {priceOpts.map((p) => <option key={p} value={p}>{euro(p)}</option>)}
-                    </select>
+                    <input
+                      type="number" inputMode="numeric" min={0} step={500} placeholder="max"
+                      aria-label="Hinta enintään" value={priceMax}
+                      onChange={(e) => setPriceMax(e.target.value)}
+                    />
+                    <span className="cap">€</span>
                   </div>
                 </div>
               </div>
               <div className="frow">
-                <div className="rl"><span className={`sg ${yearMin || yearMax ? 'on' : ''}`}>2</span><span className="t">Vuosimalli</span></div>
+                <div className="rl"><span className={`sg ${instMin || instMax ? 'on' : ''}`}>2</span><span className="t">Kuukausierä</span></div>
+                <div className="lane">
+                  <div className="rng rng-num">
+                    <span className="cap">Alkaen</span>
+                    <input
+                      type="number" inputMode="numeric" min={0} step={10} placeholder="min"
+                      aria-label="Kuukausierä alkaen" value={instMin}
+                      onChange={(e) => setInstMin(e.target.value)}
+                    />
+                    <span className="dash" aria-hidden="true">–</span>
+                    <span className="cap">Enintään</span>
+                    <input
+                      type="number" inputMode="numeric" min={0} step={10} placeholder="max"
+                      aria-label="Kuukausierä enintään" value={instMax}
+                      onChange={(e) => setInstMax(e.target.value)}
+                    />
+                    <span className="cap">€/kk</span>
+                  </div>
+                </div>
+              </div>
+              <div className="frow">
+                <div className="rl"><span className={`sg ${yearMin || yearMax ? 'on' : ''}`}>3</span><span className="t">Vuosimalli</span></div>
                 <div className="lane">
                   <div className="rng">
                     <span className="cap">Alkaen</span>
                     <select aria-label="Vuosimalli alkaen" value={yearMin} onChange={(e) => setYearMin(e.target.value)}>
                       <option value="">Ei rajaa</option>
-                      {yearOpts.map((y) => <option key={y} value={y}>{y}</option>)}
+                      {YEAR_OPTS.map((y) => <option key={y} value={y}>{y}</option>)}
                     </select>
                     <span className="dash" aria-hidden="true">–</span>
                     <span className="cap">Enintään</span>
                     <select aria-label="Vuosimalli enintään" value={yearMax} onChange={(e) => setYearMax(e.target.value)}>
                       <option value="">Ei rajaa</option>
-                      {yearOpts.map((y) => <option key={y} value={y}>{y}</option>)}
+                      {YEAR_OPTS.map((y) => <option key={y} value={y}>{y}</option>)}
                     </select>
                   </div>
                 </div>
               </div>
               <div className="frow">
-                <div className="rl"><span className={`sg ${kmMin || kmMax ? 'on' : ''}`}>3</span><span className="t">Mittarilukema</span></div>
+                <div className="rl"><span className={`sg ${kmMin || kmMax ? 'on' : ''}`}>4</span><span className="t">Mittarilukema</span></div>
                 <div className="lane" role="group" aria-label="Mittarilukema">
                   <button type="button" className="chip round" aria-pressed={!kmMin && !kmMax} onClick={() => { setKmMin(''); setKmMax(''); }}>Kaikki<sup>{inModel.length}</sup></button>
                   {kmOpts.map((s) => (
@@ -304,7 +321,7 @@ export default function InventoryBrowser({ block, catalog, initial }: {
                 </div>
               </div>
               <div className="frow">
-                <div className="rl"><span className={`sg ${fuel ? 'on' : ''}`}>4</span><span className="t">Käyttövoima</span></div>
+                <div className="rl"><span className={`sg ${fuel ? 'on' : ''}`}>5</span><span className="t">Käyttövoima</span></div>
                 <div className="lane" role="group" aria-label="Käyttövoima">
                   <button type="button" className="chip" aria-pressed={!fuel} onClick={() => setFuel('')}>Kaikki<sup>{inRange.filter((c) => !trans || c.transmission === trans).length}</sup></button>
                   {fuelChips.map((f) => (
@@ -315,7 +332,7 @@ export default function InventoryBrowser({ block, catalog, initial }: {
                 </div>
               </div>
               <div className="frow">
-                <div className="rl"><span className={`sg ${trans ? 'on' : ''}`}>5</span><span className="t">Vaihteisto</span></div>
+                <div className="rl"><span className={`sg ${trans ? 'on' : ''}`}>6</span><span className="t">Vaihteisto</span></div>
                 <div className="lane" role="group" aria-label="Vaihteisto">
                   <button type="button" className="chip round" aria-pressed={!trans} onClick={() => setTrans('')}>Kaikki<sup>{inRange.filter((c) => !fuel || c.fuel === fuel).length}</sup></button>
                   {transChips.map((t) => (

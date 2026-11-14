@@ -40,6 +40,10 @@
       "required": true,
       "min": 0
     },
+    "monthlyInstallment": {
+      "type": "integer",
+      "min": 0
+    },
     "year": {
       "type": "integer",
       "required": true,
