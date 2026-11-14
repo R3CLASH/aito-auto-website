@@ -132,10 +132,6 @@ export default function CarDetailView({ car, tpl, ctx, templateBlocks }: {
         ) : null}
       </section>
 
-      {!car.sold ? (
-        <CarCalculator price={car.price} finance={ctx.finance} eyebrow={tpl.calculatorEyebrow} title={tpl.calculatorTitle} car={waCar} />
-      ) : null}
-
       {(car.description?.length || tpl.descriptionFallback) ? (
         <section className="cd-desc">
           <div className="wrap">
@@ -143,6 +139,10 @@ export default function CarDetailView({ car, tpl, ctx, templateBlocks }: {
             {car.description?.length ? <RichText content={car.description} /> : <div className="prose"><p>{tpl.descriptionFallback}</p></div>}
           </div>
         </section>
+      ) : null}
+
+      {!car.sold ? (
+        <CarCalculator price={car.price} finance={ctx.finance} eyebrow={tpl.calculatorEyebrow} title={tpl.calculatorTitle} car={waCar} />
       ) : null}
 
       {sim.length ? (
