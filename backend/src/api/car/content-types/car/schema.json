@@ -59,6 +59,7 @@
       "type": "enumeration",
       "enum": [
         "Bensiini",
+        "Bensiini/Sähkö",
         "Diesel",
         "Hybridi",
         "Lataushybridi",
