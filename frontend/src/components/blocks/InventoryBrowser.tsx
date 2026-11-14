@@ -2,14 +2,17 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { Catalog } from '@/lib/types';
-import { km } from '@/lib/format';
+import { euro, km } from '@/lib/format';
 import CarCard from '../CarCard';
 import { useWhatsApp } from '../WhatsAppProvider';
 
 type Sort = 'new' | 'low' | 'high' | 'km';
 type Tab = 'basic' | 'adv';
+/** Which dropdown is open, or '' for none. */
+type Key = '' | 'type' | 'brand' | 'model' | 'price' | 'inst' | 'year' | 'km' | 'fuel' | 'trans';
+
 const PAGE = 24;
 const KM_STEPS = [50000, 100000, 150000, 200000];
 // A fixed span, not one derived from the stock: a buyer looking for a 1998 car
@@ -18,6 +21,20 @@ const KM_STEPS = [50000, 100000, 150000, 200000];
 const YEAR_MAX = 2023;
 const YEAR_MIN = 1980;
 const YEAR_OPTS = Array.from({ length: YEAR_MAX - YEAR_MIN + 1 }, (_, i) => YEAR_MAX - i);
+
+const BASIC_KEYS: Key[] = ['type', 'brand', 'model'];
+const ADV_KEYS: Key[] = ['price', 'inst', 'year', 'km', 'fuel', 'trans'];
+const LABEL: Record<string, string> = {
+  type: 'Tyyppi', brand: 'Merkki', model: 'Malli', price: 'Hinta', inst: 'Kuukausierä',
+  year: 'Vuosimalli', km: 'Mittarilukema', fuel: 'Käyttövoima', trans: 'Vaihteisto',
+};
+
+/** "Kaikki" / "yli 10 000 €" / "alle 25 000 €" / "10 000–25 000 €" */
+function span(lo: string, hi: string, fmt: (n: number) => string) {
+  if (!lo && !hi) return 'Kaikki';
+  if (lo && hi) return `${fmt(+lo)}–${fmt(+hi)}`;
+  return lo ? `yli ${fmt(+lo)}` : `alle ${fmt(+hi)}`;
+}
 
 export default function InventoryBrowser({ block, catalog, initial }: {
   block: any;
@@ -41,8 +58,13 @@ export default function InventoryBrowser({ block, catalog, initial }: {
   const [trans, setTrans] = useState('');
   const [sort, setSort] = useState<Sort>('new');
   const [shown, setShown] = useState(PAGE);
-  // Phones fold the whole filter panel behind a one-line summary bar.
-  const [open, setOpen] = useState(false);
+  const [openKey, setOpenKey] = useState<Key>('');
+
+  const dockRef = useRef<HTMLDivElement>(null);
+  const railRef = useRef<HTMLDivElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
+  const trigRef = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [popX, setPopX] = useState(0);
 
   const { types, brands, cars } = catalog;
   const typeObj = types.find((t) => t.slug === type);
@@ -121,7 +143,6 @@ export default function InventoryBrowser({ block, catalog, initial }: {
   const advActive = [priceMin || priceMax, yearMin || yearMax, kmMin || kmMax,
     instMin || instMax, fuel, trans].filter(Boolean).length;
   const hasFilter = !!(type || brand || model) || advActive > 0;
-  const activeCount = [type, brand, model].filter(Boolean).length + advActive;
 
   const pickType = (slug: string) => {
     setType(slug);
@@ -137,6 +158,228 @@ export default function InventoryBrowser({ block, catalog, initial }: {
     setKmMin(''); setKmMax(''); setInstMin(''); setInstMax(''); setFuel(''); setTrans('');
   };
   const clearAll = () => { setType(''); setBrand(''); setModel(''); clearAdv(); };
+  const clearOne = (k: Key) => {
+    if (k === 'type') pickType('');
+    if (k === 'brand') { setBrand(''); setModel(''); }
+    if (k === 'model') setModel('');
+    if (k === 'price') { setPriceMin(''); setPriceMax(''); }
+    if (k === 'inst') { setInstMin(''); setInstMax(''); }
+    if (k === 'year') { setYearMin(''); setYearMax(''); }
+    if (k === 'km') { setKmMin(''); setKmMax(''); }
+    if (k === 'fuel') setFuel('');
+    if (k === 'trans') setTrans('');
+  };
+
+  /* ------------------------------------------------------- dropdown plumbing */
+
+  const close = useCallback((refocus?: boolean) => {
+    setOpenKey((k) => {
+      if (refocus && k) trigRef.current[k]?.focus();
+      return '';
+    });
+  }, []);
+
+  // The popover is a sibling of the rail, not a child: the rail scrolls
+  // sideways on narrow screens and would otherwise clip it. That buys us
+  // freedom from overflow at the cost of placing it by hand.
+  useLayoutEffect(() => {
+    if (!openKey) return;
+    const place = () => {
+      const dock = dockRef.current, trig = trigRef.current[openKey], pop = popRef.current;
+      if (!dock || !trig || !pop) return;
+      const d = dock.getBoundingClientRect();
+      const t = trig.getBoundingClientRect();
+      setPopX(Math.round(Math.max(0, Math.min(t.left - d.left, d.width - pop.offsetWidth))));
+    };
+    place();
+    const rail = railRef.current;
+    window.addEventListener('resize', place);
+    rail?.addEventListener('scroll', place, { passive: true });
+    return () => {
+      window.removeEventListener('resize', place);
+      rail?.removeEventListener('scroll', place);
+    };
+  }, [openKey]);
+
+  useEffect(() => {
+    if (!openKey) return;
+    const onDown = (e: PointerEvent) => {
+      if (!dockRef.current?.contains(e.target as Node)) close();
+    };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(true); };
+    document.addEventListener('pointerdown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [openKey, close]);
+
+  const value: Record<string, string> = {
+    type: typeObj?.name || 'Kaikki',
+    brand: brandObj?.name || 'Kaikki',
+    model: modelObj?.name || (brandObj ? 'Kaikki mallit' : 'Valitse merkki'),
+    price: span(priceMin, priceMax, euro),
+    inst: span(instMin, instMax, (n) => `${n} €/kk`),
+    year: span(yearMin, yearMax, String),
+    km: span(kmMin, kmMax, km),
+    fuel: fuel || 'Kaikki',
+    trans: trans || 'Kaikki',
+  };
+  const isOn: Record<string, boolean> = {
+    type: !!type, brand: !!brand, model: !!model,
+    price: !!(priceMin || priceMax), inst: !!(instMin || instMax),
+    year: !!(yearMin || yearMax), km: !!(kmMin || kmMax), fuel: !!fuel, trans: !!trans,
+  };
+
+  const trigger = (k: Key) => (
+    <button
+      key={k}
+      type="button"
+      ref={(el) => { trigRef.current[k] = el; }}
+      className="fdrop"
+      data-on={isOn[k] || undefined}
+      data-open={openKey === k || undefined}
+      aria-expanded={openKey === k}
+      aria-controls="fpop"
+      aria-haspopup="true"
+      onClick={() => setOpenKey((cur) => (cur === k ? '' : k))}
+    >
+      <span className="fd-l">{LABEL[k]}</span>
+      <span className="fd-v">{value[k]}</span>
+      <svg className="fd-c" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <path d="M3.5 6 8 10.5 12.5 6" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="square" />
+      </svg>
+    </button>
+  );
+
+  const numRange = (
+    lo: string, setLo: (v: string) => void, hi: string, setHi: (v: string) => void,
+    label: string, unit: string, step: number,
+  ) => (
+    <div className="fp-range">
+      <label className="fp-f">
+        <span>Alkaen</span>
+        <input type="number" inputMode="numeric" min={0} step={step} placeholder="min"
+          aria-label={`${label} alkaen`} value={lo} onChange={(e) => setLo(e.target.value)} />
+      </label>
+      <span className="fp-dash" aria-hidden="true" />
+      <label className="fp-f">
+        <span>Enintään</span>
+        <input type="number" inputMode="numeric" min={0} step={step} placeholder="max"
+          aria-label={`${label} enintään`} value={hi} onChange={(e) => setHi(e.target.value)} />
+      </label>
+      <span className="fp-u">{unit}</span>
+    </div>
+  );
+
+  const popBody = () => {
+    switch (openKey) {
+      case 'type':
+        return (
+          <div className="fp-wrap">
+            {typeChips.map((t) => (
+              <button key={t.slug || 'all'} type="button" className="chip" aria-pressed={type === t.slug} onClick={() => pickType(t.slug)}>
+                {t.img ? <Image className="ci" src={t.img.url} alt="" width={96} height={36} /> : null}
+                {t.name}<sup>{t.n}</sup>
+              </button>
+            ))}
+          </div>
+        );
+      case 'brand':
+        return (
+          <div className="fp-wrap">
+            <button type="button" className="pchip" aria-pressed={!brand} onClick={() => { setBrand(''); setModel(''); }}>
+              <i>FIN</i><b>Kaikki</b><sup>{inType.length}</sup>
+            </button>
+            {brandChips.map((b) => (
+              <button key={b.slug} type="button" className="pchip" aria-pressed={brand === b.slug} onClick={() => { setBrand(b.slug); setModel(''); }}>
+                <i>FIN</i><b>{b.name}</b><sup>{b.n}</sup>
+              </button>
+            ))}
+          </div>
+        );
+      case 'model':
+        return brandObj ? (
+          <div className="fp-wrap">
+            <button type="button" className="chip round" aria-pressed={!model} onClick={() => setModel('')}>Kaikki mallit<sup>{inBrand.length}</sup></button>
+            {modelChips.map((m) => (
+              <button key={m.slug} type="button" className="chip round" aria-pressed={model === m.slug} onClick={() => setModel(m.slug)}>
+                {m.name}<sup>{m.n}</sup>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="fp-hint">Valitse ensin merkki, niin sen mallit ilmestyvät tähän.</p>
+        );
+      case 'price':
+        return numRange(priceMin, setPriceMin, priceMax, setPriceMax, 'Hinta', '€', 500);
+      case 'inst':
+        return numRange(instMin, setInstMin, instMax, setInstMax, 'Kuukausierä', '€/kk', 10);
+      case 'year':
+        return (
+          <div className="fp-range">
+            <label className="fp-f">
+              <span>Alkaen</span>
+              <select aria-label="Vuosimalli alkaen" value={yearMin} onChange={(e) => setYearMin(e.target.value)}>
+                <option value="">Ei rajaa</option>
+                {YEAR_OPTS.map((y) => <option key={y} value={y}>{y}</option>)}
+              </select>
+            </label>
+            <span className="fp-dash" aria-hidden="true" />
+            <label className="fp-f">
+              <span>Enintään</span>
+              <select aria-label="Vuosimalli enintään" value={yearMax} onChange={(e) => setYearMax(e.target.value)}>
+                <option value="">Ei rajaa</option>
+                {YEAR_OPTS.map((y) => <option key={y} value={y}>{y}</option>)}
+              </select>
+            </label>
+          </div>
+        );
+      case 'km':
+        return (
+          <>
+            <div className="fp-wrap">
+              <button type="button" className="chip round" aria-pressed={!kmMin && !kmMax} onClick={() => { setKmMin(''); setKmMax(''); }}>Kaikki<sup>{inModel.length}</sup></button>
+              {kmOpts.map((s) => (
+                <button key={s} type="button" className="chip round" aria-pressed={!kmMin && kmMax === String(s)} onClick={() => { setKmMin(''); setKmMax(String(s)); }}>
+                  alle {km(s)}<sup>{inModel.filter((c) => c.mileage <= s).length}</sup>
+                </button>
+              ))}
+            </div>
+            {/* The boxes write the same kmMin/kmMax the presets do, so a preset
+                fills the max box and a typed step lights its chip back up. */}
+            {numRange(kmMin, setKmMin, kmMax, setKmMax, 'Mittarilukema', 'km', 1000)}
+          </>
+        );
+      case 'fuel':
+        return (
+          <div className="fp-wrap">
+            <button type="button" className="chip" aria-pressed={!fuel} onClick={() => setFuel('')}>Kaikki<sup>{inRange.filter((c) => !trans || c.transmission === trans).length}</sup></button>
+            {fuelChips.map((f) => (
+              <button key={f.name} type="button" className="chip" aria-pressed={fuel === f.name} onClick={() => setFuel(f.name)}>
+                {f.name}<sup>{f.n}</sup>
+              </button>
+            ))}
+          </div>
+        );
+      case 'trans':
+        return (
+          <div className="fp-wrap">
+            <button type="button" className="chip round" aria-pressed={!trans} onClick={() => setTrans('')}>Kaikki<sup>{inRange.filter((c) => !fuel || c.fuel === fuel).length}</sup></button>
+            {transChips.map((t) => (
+              <button key={t.name} type="button" className="chip round" aria-pressed={trans === t.name} onClick={() => setTrans(t.name)}>
+                {t.name}<sup>{t.n}</sup>
+              </button>
+            ))}
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const keys = tab === 'basic' ? BASIC_KEYS : ADV_KEYS;
 
   return (
     <>
@@ -165,186 +408,51 @@ export default function InventoryBrowser({ block, catalog, initial }: {
         </div>
       </section>
 
-      <section className={`strip ${tab === 'adv' ? 'adv' : ''} ${open ? 'mob-open' : ''}`} aria-label="Rajaa autoja">
+      <section className="strip" aria-label="Rajaa autoja">
         <div className="wrap">
-          {/* Phone only: collapses the tabs and rows below into a single line. */}
-          <button type="button" className="fbar" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-            <span className="fbar-t">Rajaa autoja</span>
-            {activeCount ? <span className="fbar-n">{activeCount}</span> : null}
-            <span className="fbar-r">{result.length} {result.length === 1 ? 'auto' : 'autoa'}</span>
-            <span className="fbar-c" aria-hidden="true" />
-          </button>
-
           <div className="ftabs" role="tablist" aria-label="Hakutapa">
-            <button type="button" className="ftab" role="tab" id="tab-basic" aria-selected={tab === 'basic'} aria-controls="panel-basic" onClick={() => setTab('basic')}>
+            <button type="button" className="ftab" role="tab" id="tab-basic" aria-selected={tab === 'basic'} aria-controls="panel-basic"
+              onClick={() => { setTab('basic'); close(); }}>
               Perushaku
             </button>
-            <button type="button" className="ftab" role="tab" id="tab-adv" aria-selected={tab === 'adv'} aria-controls="panel-adv" onClick={() => setTab('adv')}>
+            <button type="button" className="ftab" role="tab" id="tab-adv" aria-selected={tab === 'adv'} aria-controls="panel-adv"
+              onClick={() => { setTab('adv'); close(); }}>
               Tarkennettu haku{advActive ? <sup>{advActive}</sup> : null}
             </button>
           </div>
 
-          {tab === 'basic' ? (
-            <div className="fpanel" role="tabpanel" id="panel-basic" aria-labelledby="tab-basic">
-              <div className="spine" aria-hidden="true" />
-              <div className="frow">
-                <div className="rl"><span className={`sg ${type ? 'on' : ''}`}>1</span><span className="t">Tyyppi</span></div>
-                <div className="lane" role="group" aria-label="Ajoneuvotyyppi">
-                  {typeChips.map((t) => (
-                    <button key={t.slug || 'all'} type="button" className="chip" aria-pressed={type === t.slug} onClick={() => pickType(t.slug)}>
-                      {t.img ? <Image className="ci" src={t.img.url} alt="" width={96} height={36} /> : null}
-                      {t.name}<sup>{t.n}</sup>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="frow">
-                <div className="rl"><span className={`sg ${brand ? 'on' : ''}`}>2</span><span className="t">Merkki</span></div>
-                <div className="lane" role="group" aria-label="Merkki">
-                  <button type="button" className="pchip" aria-pressed={!brand} onClick={() => { setBrand(''); setModel(''); }}>
-                    <i>FIN</i><b>Kaikki</b><sup>{inType.length}</sup>
+          <div
+            className="fdock"
+            ref={dockRef}
+            role="tabpanel"
+            id={tab === 'basic' ? 'panel-basic' : 'panel-adv'}
+            aria-labelledby={tab === 'basic' ? 'tab-basic' : 'tab-adv'}
+          >
+            <div className="frail" ref={railRef}>
+              {keys.map(trigger)}
+              {hasFilter ? (
+                <button type="button" className="clr fclr" onClick={() => { clearAll(); close(); }}>✕ Tyhjennä kaikki</button>
+              ) : null}
+            </div>
+
+            {openKey ? (
+              <div className="fpop" id="fpop" ref={popRef} style={{ left: popX }} role="group" aria-label={LABEL[openKey]}>
+                <div className="fpop-h">
+                  <span className="fpop-t">{LABEL[openKey]}</span>
+                  <strong className="fpop-n" aria-live="polite">{result.length} {result.length === 1 ? 'auto' : 'autoa'}</strong>
+                  {isOn[openKey] ? (
+                    <button type="button" className="fpop-r" onClick={() => clearOne(openKey)}>Tyhjennä</button>
+                  ) : null}
+                  <button type="button" className="fpop-x" onClick={() => close(true)} aria-label="Sulje">
+                    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                      <path d="m4 4 8 8M12 4l-8 8" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="square" />
+                    </svg>
                   </button>
-                  {brandChips.map((b) => (
-                    <button key={b.slug} type="button" className="pchip" aria-pressed={brand === b.slug} onClick={() => { setBrand(b.slug); setModel(''); }}>
-                      <i>FIN</i><b>{b.name}</b><sup>{b.n}</sup>
-                    </button>
-                  ))}
                 </div>
+                {popBody()}
               </div>
-              <div className="frow">
-                <div className="rl"><span className={`sg ${model ? 'on' : ''}`}>3</span><span className="t">Malli</span></div>
-                <div className="lane" role="group" aria-label="Malli">
-                  {brandObj ? (
-                    <>
-                      <button type="button" className="chip round" aria-pressed={!model} onClick={() => setModel('')}>Kaikki mallit<sup>{inBrand.length}</sup></button>
-                      {modelChips.map((m) => (
-                        <button key={m.slug} type="button" className="chip round" aria-pressed={model === m.slug} onClick={() => setModel(m.slug)}>
-                          {m.name}<sup>{m.n}</sup>
-                        </button>
-                      ))}
-                    </>
-                  ) : (
-                    <span className="hint">↑ Valitse merkki, niin sen mallit ilmestyvät tähän</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="fpanel" role="tabpanel" id="panel-adv" aria-labelledby="tab-adv">
-              <div className="spine" aria-hidden="true" />
-              <div className="frow">
-                <div className="rl"><span className={`sg ${priceMin || priceMax ? 'on' : ''}`}>1</span><span className="t">Hinta</span></div>
-                <div className="lane">
-                  <div className="rng rng-num">
-                    <span className="cap">Alkaen</span>
-                    <input
-                      type="number" inputMode="numeric" min={0} step={500} placeholder="min"
-                      aria-label="Hinta alkaen" value={priceMin}
-                      onChange={(e) => setPriceMin(e.target.value)}
-                    />
-                    <span className="dash" aria-hidden="true">–</span>
-                    <span className="cap">Enintään</span>
-                    <input
-                      type="number" inputMode="numeric" min={0} step={500} placeholder="max"
-                      aria-label="Hinta enintään" value={priceMax}
-                      onChange={(e) => setPriceMax(e.target.value)}
-                    />
-                    <span className="cap">€</span>
-                  </div>
-                </div>
-              </div>
-              <div className="frow">
-                <div className="rl"><span className={`sg ${instMin || instMax ? 'on' : ''}`}>2</span><span className="t">Kuukausierä</span></div>
-                <div className="lane">
-                  <div className="rng rng-num">
-                    <span className="cap">Alkaen</span>
-                    <input
-                      type="number" inputMode="numeric" min={0} step={10} placeholder="min"
-                      aria-label="Kuukausierä alkaen" value={instMin}
-                      onChange={(e) => setInstMin(e.target.value)}
-                    />
-                    <span className="dash" aria-hidden="true">–</span>
-                    <span className="cap">Enintään</span>
-                    <input
-                      type="number" inputMode="numeric" min={0} step={10} placeholder="max"
-                      aria-label="Kuukausierä enintään" value={instMax}
-                      onChange={(e) => setInstMax(e.target.value)}
-                    />
-                    <span className="cap">€/kk</span>
-                  </div>
-                </div>
-              </div>
-              <div className="frow">
-                <div className="rl"><span className={`sg ${yearMin || yearMax ? 'on' : ''}`}>3</span><span className="t">Vuosimalli</span></div>
-                <div className="lane">
-                  <div className="rng">
-                    <span className="cap">Alkaen</span>
-                    <select aria-label="Vuosimalli alkaen" value={yearMin} onChange={(e) => setYearMin(e.target.value)}>
-                      <option value="">Ei rajaa</option>
-                      {YEAR_OPTS.map((y) => <option key={y} value={y}>{y}</option>)}
-                    </select>
-                    <span className="dash" aria-hidden="true">–</span>
-                    <span className="cap">Enintään</span>
-                    <select aria-label="Vuosimalli enintään" value={yearMax} onChange={(e) => setYearMax(e.target.value)}>
-                      <option value="">Ei rajaa</option>
-                      {YEAR_OPTS.map((y) => <option key={y} value={y}>{y}</option>)}
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <div className="frow">
-                <div className="rl"><span className={`sg ${kmMin || kmMax ? 'on' : ''}`}>4</span><span className="t">Mittarilukema</span></div>
-                <div className="lane" role="group" aria-label="Mittarilukema">
-                  <button type="button" className="chip round" aria-pressed={!kmMin && !kmMax} onClick={() => { setKmMin(''); setKmMax(''); }}>Kaikki<sup>{inModel.length}</sup></button>
-                  {kmOpts.map((s) => (
-                    <button key={s} type="button" className="chip round" aria-pressed={!kmMin && kmMax === String(s)} onClick={() => { setKmMin(''); setKmMax(String(s)); }}>
-                      alle {km(s)}<sup>{inModel.filter((c) => c.mileage <= s).length}</sup>
-                    </button>
-                  ))}
-                  {/* The boxes write the same kmMin/kmMax the chips do, so a chip
-                      fills the max box and a typed step lights its chip back up. */}
-                  <div className="rng rng-num">
-                    <span className="cap">Oma väli</span>
-                    <input
-                      type="number" inputMode="numeric" min={0} step={1000} placeholder="min"
-                      aria-label="Mittarilukema alkaen" value={kmMin}
-                      onChange={(e) => setKmMin(e.target.value)}
-                    />
-                    <span className="dash" aria-hidden="true">–</span>
-                    <input
-                      type="number" inputMode="numeric" min={0} step={1000} placeholder="max"
-                      aria-label="Mittarilukema enintään" value={kmMax}
-                      onChange={(e) => setKmMax(e.target.value)}
-                    />
-                    <span className="cap">km</span>
-                  </div>
-                </div>
-              </div>
-              <div className="frow">
-                <div className="rl"><span className={`sg ${fuel ? 'on' : ''}`}>5</span><span className="t">Käyttövoima</span></div>
-                <div className="lane" role="group" aria-label="Käyttövoima">
-                  <button type="button" className="chip" aria-pressed={!fuel} onClick={() => setFuel('')}>Kaikki<sup>{inRange.filter((c) => !trans || c.transmission === trans).length}</sup></button>
-                  {fuelChips.map((f) => (
-                    <button key={f.name} type="button" className="chip" aria-pressed={fuel === f.name} onClick={() => setFuel(f.name)}>
-                      {f.name}<sup>{f.n}</sup>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="frow">
-                <div className="rl"><span className={`sg ${trans ? 'on' : ''}`}>6</span><span className="t">Vaihteisto</span></div>
-                <div className="lane" role="group" aria-label="Vaihteisto">
-                  <button type="button" className="chip round" aria-pressed={!trans} onClick={() => setTrans('')}>Kaikki<sup>{inRange.filter((c) => !fuel || c.fuel === fuel).length}</sup></button>
-                  {transChips.map((t) => (
-                    <button key={t.name} type="button" className="chip round" aria-pressed={trans === t.name} onClick={() => setTrans(t.name)}>
-                      {t.name}<sup>{t.n}</sup>
-                    </button>
-                  ))}
-                  {advActive ? <button type="button" className="clr adv-clr" onClick={clearAdv}>✕ Tyhjennä tarkennukset</button> : null}
-                </div>
-              </div>
-            </div>
-          )}
+            ) : null}
+          </div>
         </div>
       </section>
 
