@@ -52,7 +52,6 @@ export default async function BlockRenderer({ blocks, ctx, filter }: { blocks: B
           case 'sections.vehicle-types-grid': return <S.VehicleTypesGrid key={key} {...p} />;
           case 'sections.latest-cars': return <S.LatestCars key={key} {...p} />;
           case 'sections.process-road': return <S.ProcessRoad key={key} {...p} />;
-          case 'sections.finance-teaser': return <S.FinanceTeaser key={key} {...p} />;
           case 'sections.services-list': return <S.ServicesList key={key} {...p} />;
           case 'sections.cta-banner': return <S.CtaBanner key={key} {...p} />;
           case 'sections.page-header': return <S.PageHeader key={key} {...p} />;

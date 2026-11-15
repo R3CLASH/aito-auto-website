@@ -1,8 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { SiteContext } from '@/lib/types';
-import { monthlyPayment } from '@/lib/finance';
-import { euro, fmt, pct, telHref, two } from '@/lib/format';
+import { telHref, two } from '@/lib/format';
 import CarCard from '../CarCard';
 import Plate from '../Plate';
 import SmartLink from '../SmartLink';
@@ -127,33 +126,6 @@ export function ProcessRoad({ block }: P) {
             {s.text ? <p>{s.text}</p> : null}
           </div>
         ))}
-      </div>
-    </section>
-  );
-}
-
-export function FinanceTeaser({ block, ctx }: P) {
-  const f = ctx.finance;
-  const price = block.examplePrice || ctx.catalog.cars[0]?.price || 25000;
-  const r = monthlyPayment(price, f);
-  return (
-    <section className="wrap sec fin-sec">
-      <div className="fin-card rv">
-        <div className="m" style={{ marginTop: 0, letterSpacing: '.08em' }}>ESIMERKKILASKELMA</div>
-        <div className="d big">{fmt(r.monthly)}<span> €/kk</span></div>
-        <div className="m">
-          {block.exampleLabel ? `${block.exampleLabel} ` : ''}{euro(price)} · käsiraha {euro(r.down)}<br />
-          {r.term} kk · korko {pct(r.rate)} % · avausmaksu {euro(f.openingFee)} · {f.monthlyFee} €/kk
-          {f.exampleNote ? <><br />{f.exampleNote}</> : null}
-        </div>
-      </div>
-      <div className="fin-copy">
-        {block.eyebrow ? <div className="eyebrow">{block.eyebrow}</div> : null}
-        <h2 className="d wipe">{block.title}</h2>
-        {block.text ? <p>{block.text}</p> : null}
-        {block.buttonLabel ? (
-          <SmartLink className="btn btn-navy cut" href={block.buttonUrl || '/autot'}>{block.buttonLabel} <Arrow /></SmartLink>
-        ) : null}
       </div>
     </section>
   );

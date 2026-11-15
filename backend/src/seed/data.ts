@@ -111,7 +111,7 @@ export const featured: [string, string, string][] = [
 export const global = {
   siteName: 'Aito Auto Oy',
   tagline: 'Aitoja autoja, rehellisiä hintoja.',
-  whatsappNumber: '358000000000',
+  whatsappNumber: '358415895737',
   phone: '+358415895737',
   phoneDisplay: '041 589 5737',
   email: 'myynti@aitoauto.fi',
@@ -229,10 +229,7 @@ export const pages = [
         { title: 'Koeaja rauhassa', text: 'Varaa aika, tule paikan päälle ja tutustu autoon ilman kiirettä.' },
         { title: 'Aja kotiin', text: 'Hoidamme rahoituksen, vaihtoauton ja paperit. Sinä saat avaimet.' },
       ] },
-      { __component: 'sections.finance-teaser', eyebrow: '04 — Rahoitus', title: 'Tiedä erä ennen kuin kysyt',
-        text: 'Jokaisella auton sivulla on laskuri: säädä käsirahaa, laina-aikaa ja loppuerää ja näe kuukausierä heti. Kun summa tuntuu oikealta, lähetä laskelma meille yhdellä napautuksella.',
-        exampleLabel: 'Honda Accord', examplePrice: 27900, buttonLabel: 'Kokeile laskuria', buttonUrl: '/autot/honda/accord' },
-      { __component: 'sections.services-list', eyebrow: '05 — Palvelut', title: 'Kaikki samasta paikasta', linkLabel: 'Kaikki palvelut →', linkUrl: '/palvelut', rows: [
+      { __component: 'sections.services-list', eyebrow: '04 — Palvelut', title: 'Kaikki samasta paikasta', linkLabel: 'Kaikki palvelut →', linkUrl: '/palvelut', rows: [
         { title: 'Rahoitus', text: 'Joustava autolaina tai osamaksu, myös loppuerällä.', url: '/palvelut#rahoitus' },
         { title: 'Vaihtoauto', text: 'Nykyinen autosi käy maksusta – arvio nopeasti.', url: '/palvelut#vaihtoauto' },
         { title: 'Takuu & huolto', text: 'Lisäturvaa ostoksellesi ja huolto hoidettuna.', url: '/palvelut#takuu' },

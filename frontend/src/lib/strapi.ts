@@ -302,7 +302,6 @@ const SECTION_POPULATE: Record<string, unknown> = {
   'sections.vehicle-types-grid': true,
   'sections.latest-cars': true,
   'sections.process-road': { populate: { steps: true } },
-  'sections.finance-teaser': true,
   'sections.services-list': { populate: { rows: true } },
   'sections.cta-banner': true,
   'sections.page-header': true,
