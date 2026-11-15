@@ -12,9 +12,6 @@
     },
     "emptyText": {
       "type": "text"
-    },
-    "disclaimer": {
-      "type": "text"
     }
   }
 }

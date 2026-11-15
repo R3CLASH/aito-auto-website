@@ -487,7 +487,6 @@ export default function InventoryBrowser({ block, catalog, initial }: {
                 </button>
               </div>
             ) : null}
-            {block.disclaimer ? <p className="disclaimer">{block.disclaimer}</p> : null}
           </>
         ) : (
           <div className="empty">
