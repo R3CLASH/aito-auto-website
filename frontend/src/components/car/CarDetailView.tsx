@@ -42,7 +42,7 @@ export default function CarDetailView({ car, tpl, ctx, templateBlocks }: {
     ['Vetotapa', car.drivetrain],
     ['Teho', car.powerKw ? `${car.powerKw} kW (${Math.round(car.powerKw * 1.36)} hv)` : ''],
     ['Väri', car.color],
-    ['Katsastettu', car.inspectedUntil],
+    ['Katsastus voimassa', car.inspectedUntil],
     ['CO₂ (WLTP)', car.co2 ? `${car.co2} g/km` : ''],
     ['Arvonlisävero', car.vatDeductible ? 'ALV-vähennyskelpoinen' : ''],
     ...car.extraSpecs.map((s) => [s.label, s.value] as [string, string]),

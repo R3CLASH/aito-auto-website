@@ -99,7 +99,7 @@ const LAYOUTS: Record<string, Layout> = {
       drivetrain: ['Vetotapa (Drivetrain)'],
       powerKw: ['Teho kW (Power)'],
       color: ['Väri (Colour)'],
-      inspectedUntil: ['Katsastettu (Inspected until)', 'Esim. 05/2027'],
+      inspectedUntil: ['Katsastus voimassa (Inspected until)', 'Esim. 05/2027'],
       co2: ['CO₂ g/km (CO₂ emissions)'],
       badge: ['Merkintä kortissa (Card badge)', 'Lyhyt tarra kuvan päällä, esim. UUSI, NELIVETO, ALV-VÄH.'],
       featured: ['Nosto etusivulle (Featured on home page)', 'Näytetään etusivun "Juuri pihaan" -osiossa.'],
