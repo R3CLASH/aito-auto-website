@@ -2,8 +2,9 @@ import 'server-only';
 import qs from 'qs';
 import { cache } from 'react';
 import { monthlyPayment } from './finance';
+import { BUILTIN_PAGES, SELL_LINK } from './builtinPages';
 import type {
-  BrandNode, CarDetail, CarSummary, Catalog, FinanceSettings, GlobalSettings, Media,
+  BrandNode, CarDetail, CarSummary, Catalog, FinanceSettings, GlobalSettings, Link, Media,
   PageData, ServiceItem, SocialLink, VehicleType, CarDetailTemplate,
 } from './types';
 
@@ -19,7 +20,7 @@ export const CACHE_TAG = 'strapi';
  * named and ask again; the mapping below already treats every new field as
  * optional, so the page renders without it until the CMS catches up.
  */
-const INVALID_KEY = /Invalid key ([A-Za-z0-9_]+)/;
+const INVALID_KEY = /Invalid key ([A-Za-z0-9_.-]+)/;
 
 function withoutKey(query: Record<string, unknown>, key: string): Record<string, unknown> | null {
   let dropped = false;
@@ -108,6 +109,15 @@ const SOCIALS: { key: SocialLink['key']; label: string; field: string }[] = [
 const socialLinks = (g: any): SocialLink[] =>
   SOCIALS.map(({ key, label, field }) => ({ key, label, url: (g[field] || '').trim() })).filter((s) => s.url);
 
+/** Built-in pages stay reachable from the menu until the CMS navigation lists them itself. */
+function withBuiltinNav(nav: Link[]): Link[] {
+  if (nav.some((l) => l.url === SELL_LINK.url)) return nav;
+  const at = nav.findIndex((l) => l.url === '/palvelut');
+  const out = [...nav];
+  out.splice(at < 0 ? out.length : at + 1, 0, SELL_LINK);
+  return out;
+}
+
 export const getGlobal = cache(async (): Promise<GlobalSettings> => {
   const res = await api('global', {
     populate: {
@@ -134,7 +144,7 @@ export const getGlobal = cache(async (): Promise<GlobalSettings> => {
     mapEmbedUrl: g.mapEmbedUrl || '',
     openingHours: [...(g.openingHours || [])].sort((a: any, b: any) => a.dayIndex - b.dayIndex),
     openingHoursNote: g.openingHoursNote || '',
-    navigation: g.navigation || [],
+    navigation: withBuiltinNav(g.navigation || []),
     headerCta: g.headerCta || null,
     footerTagline: g.footerTagline || '',
     footerLinks: g.footerLinks || [],
@@ -354,6 +364,7 @@ const SECTION_POPULATE: Record<string, unknown> = {
   'sections.team': { populate: { members: { populate: { photo: true } } } },
   'sections.visit-cta': true,
   'sections.contact-hub': true,
+  'sections.sell-car': { populate: { points: true } },
   'sections.rich-text': true,
 };
 
@@ -375,7 +386,7 @@ export const getPage = cache(async (slug: string): Promise<PageData | null> => {
     populate: { seo: { populate: { shareImage: true } }, blocks: blocksPopulate },
   });
   const p = res.data?.[0];
-  if (!p) return null;
+  if (!p) return BUILTIN_PAGES[slug] ?? null;
   return {
     title: p.title,
     slug: p.slug,
@@ -386,7 +397,7 @@ export const getPage = cache(async (slug: string): Promise<PageData | null> => {
 
 export const getPageSlugs = cache(async (): Promise<string[]> => {
   const all = await fetchAll('pages', { fields: ['slug'] });
-  return all.map((p: any) => p.slug);
+  return [...new Set([...all.map((p: any) => p.slug), ...Object.keys(BUILTIN_PAGES)])];
 });
 
 export const getServices = cache(async (): Promise<ServiceItem[]> => {

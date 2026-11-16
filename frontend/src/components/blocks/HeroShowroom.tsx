@@ -30,7 +30,7 @@ export default function HeroShowroom({ block, carCount }: { block: any; carCount
             plates with an arrow end, a white supplementary plate underneath,
             both bolted to one post. Buying points on, selling points back. */}
         <nav className="hero-nav" aria-label="Osta tai myy">
-          <span className="post" aria-hidden="true" />
+          <span className="sign-post" aria-hidden="true" />
           <SmartLink className="sign sign-buy" href={buy.url}>
             <span className="sign-plate">
               <span className="sign-t d">{buy.label}</span>

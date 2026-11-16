@@ -210,12 +210,12 @@ h1, h2, h3, p { margin: 0; }
 .hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
 /* ---------- hero: buy / sell as a signpost fork ---------- */
 .hero-nav { flex: 1 1 440px; min-width: 0; position: relative; display: grid; gap: 30px; padding: 6px 0 48px; }
-.post {
+.sign-post {
   position: absolute; left: 50%; top: -24px; bottom: 0; width: 12px; transform: translateX(-50%);
   background: linear-gradient(90deg, #7f8692, #dfe2e6 45%, #969ca7);
 }
 /* where the post meets the ground */
-.post::after {
+.sign-post::after {
   content: ''; position: absolute; left: 50%; bottom: -7px; width: 90px; height: 14px; transform: translateX(-50%);
   background: radial-gradient(closest-side, rgba(0, 0, 0, .35), transparent);
 }
@@ -805,6 +805,51 @@ h1, h2, h3, p { margin: 0; }
 .ct-form h2 { font-size: 52px; color: var(--navy); margin-bottom: 8px; }
 .ct-form > p { margin-bottom: 26px; color: #4a5566; }
 .ct-form .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+/* ---------- sell your car ---------- */
+.sell { position: relative; overflow: hidden; background: var(--navy); color: #fff; }
+.sell::before { content: ''; position: absolute; inset: 0; background: var(--azure); clip-path: polygon(0 0, 46% 0, 30% 100%, 0 100%); }
+.sell-in {
+  position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  grid-template-areas: 'copy card' 'pts card'; gap: 0 56px; align-items: start; padding-top: 80px; padding-bottom: 96px;
+}
+.sell-copy { grid-area: copy; }
+.sell-card { grid-area: card; }
+.sell-pts { grid-area: pts; }
+@media (max-width: 980px) {
+  .sell-in { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'copy' 'card' 'pts'; }
+  .sell-copy { margin-bottom: 32px; }
+}
+.sell-copy .eyebrow { color: #e6f1f8; }
+.sell-copy h1 { margin-top: 16px; font-size: clamp(56px, 7.4vw, 112px); }
+.sell-copy > p { margin-top: 24px; max-width: 470px; font-size: 18px; line-height: 1.6; color: #eaf2f8; }
+.sell-pts { list-style: none; margin: 36px 0 0; padding: 0; display: grid; gap: 2px; max-width: 470px; }
+.sell-pts li { display: flex; gap: 16px; align-items: baseline; padding: 16px 0; border-top: 1px solid rgba(255, 255, 255, .22); }
+.sell-pts li:last-child { border-bottom: 1px solid rgba(255, 255, 255, .22); }
+.sell-pts .sn { font: 13px var(--f-mono); color: var(--sky); flex: none; }
+.sell-pts strong { display: block; font-size: 18px; }
+.sell-pts li span span { display: block; margin-top: 2px; color: #c9d3e0; line-height: 1.5; }
+.sell-card { background: #fff; color: var(--ink); padding: 34px; box-shadow: 0 30px 60px -30px rgba(0, 0, 0, .5); }
+.sell-card h2 { font-size: 46px; color: var(--navy); }
+.sell-card h2:focus { outline: none; }
+.sell-lead { margin: 8px 0 24px; color: var(--muted); line-height: 1.5; }
+.sell-lead strong { color: var(--ink); }
+.sell-card .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.field.invalid .plate-in { border-color: #b42318; }
+.sell-steps { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; font: 12px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.sell-steps span { display: inline-flex; align-items: center; gap: 8px; }
+.sell-steps b { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--line-2); font-weight: 600; }
+.sell-steps span[data-on] { color: var(--navy); }
+.sell-steps span[data-on] b { background: var(--azure); color: #fff; box-shadow: none; }
+.sell-steps i { flex: 0 1 48px; height: 2px; background: var(--line); }
+.link-btn { background: none; border: 0; padding: 0; color: var(--azure-t); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.link-btn:hover { color: var(--navy); }
+.sell-wa { justify-self: start; margin-top: 4px; }
+.sell-done { display: grid; gap: 16px; justify-items: start; }
+.sell-done p { color: var(--body); line-height: 1.6; max-width: 460px; }
+.sell-plate { display: inline-flex; align-items: stretch; height: 58px; border: 3px solid var(--ink); border-radius: 7px; overflow: hidden; background: #fff; }
+.sell-plate span { background: var(--azure); color: #fff; font: 700 11px var(--f-body); letter-spacing: .08em; padding: 0 8px 7px; display: flex; align-items: flex-end; }
+.sell-plate b { font: 800 38px var(--f-display); font-stretch: 72%; font-variation-settings: 'wdth' 72; letter-spacing: .04em; padding: 6px 14px 0; }
 .ct-done { padding: 40px 0; text-align: center; }
 .ct-done .d { font-size: 120px; color: var(--azure); }
 .ct-done p { margin: 14px auto 24px; max-width: 420px; font-size: 18px; line-height: 1.6; color: #2d394a; }
@@ -995,6 +1040,10 @@ h1, h2, h3, p { margin: 0; }
   .tk { min-height: 150px; }
   .tk .d { font-size: 30px; }
   .ct-form { padding: 22px; }
+  .sell::before { clip-path: polygon(0 0, 78% 0, 52% 260px, 0 260px); }
+  .sell-in { padding-top: 48px; padding-bottom: 56px; }
+  .sell-card { padding: 22px; }
+  .sell-card h2 { font-size: 36px; }
   .ct-done .d { font-size: 80px; }
   .modal-head h2 { font-size: 32px; }
   .plate.xl b { font-size: 36px; padding: 5px 14px 1px; }

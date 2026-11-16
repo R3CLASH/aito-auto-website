@@ -1,0 +1,39 @@
+{
+  "collectionName": "components_sections_sell_cars",
+  "info": {
+    "displayName": "Myy auto – lomake (Sell car)",
+    "icon": "car"
+  },
+  "options": {},
+  "attributes": {
+    "eyebrow": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "intro": {
+      "type": "text"
+    },
+    "points": {
+      "type": "component",
+      "component": "shared.step",
+      "repeatable": true
+    },
+    "formTitle": {
+      "type": "string",
+      "default": "Pyydä ostotarjous"
+    },
+    "consentText": {
+      "type": "text"
+    },
+    "successTitle": {
+      "type": "string",
+      "default": "Kiitos!"
+    },
+    "successText": {
+      "type": "text"
+    }
+  }
+}
