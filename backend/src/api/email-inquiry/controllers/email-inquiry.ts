@@ -84,7 +84,7 @@ export default factories.createCoreController('api::email-inquiry.email-inquiry'
     // and only recorded on the entry via `notified`.
     const notified = await strapi
       .service('api::email-inquiry.email-inquiry')
-      .notify(data)
+      .notify({ ...data, carDetails: str(body.carDetails, 300), documentId: inquiry.documentId })
       .catch((err: unknown) => {
         strapi.log.error(`email-inquiry: notification failed – ${err instanceof Error ? err.message : err}`);
         return false;

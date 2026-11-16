@@ -68,6 +68,10 @@
       "type": "boolean",
       "default": false
     },
+    "emailNotified": {
+      "type": "boolean",
+      "default": false
+    },
     "internalNotes": {
       "type": "text"
     }

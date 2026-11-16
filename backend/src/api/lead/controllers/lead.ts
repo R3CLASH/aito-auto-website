@@ -1,5 +1,6 @@
 import { factories } from '@strapi/strapi';
 import crypto from 'node:crypto';
+import { sendSalesEmail } from '../../../notifications/sales-email';
 
 /**
  * Leads are only created through POST /api/leads/submit, which the Next.js
@@ -80,20 +81,27 @@ export default factories.createCoreController('api::lead.lead', ({ strapi }) => 
       } as any,
     });
 
-    // Message sales on WhatsApp. A failed send must never lose the lead, so it
-    // is caught and only recorded on the entry via `notified`.
-    const notified = await strapi
-      .service('api::lead.lead')
-      .notify({ name, phone, email, topic: str(body.topic, 80), message: str(body.message, 4000),
-        carTitle: str(body.carTitle, 200), carDetails: str(body.carDetails, 300), tradeIn: str(body.tradeIn, 200),
-        sourcePage: str(body.sourcePage, 200) })
-      .catch((err: unknown) => {
+    const submission = {
+      name, phone, email, topic: str(body.topic, 80), message: str(body.message, 4000),
+      carTitle: str(body.carTitle, 200), carDetails: str(body.carDetails, 300), tradeIn: str(body.tradeIn, 200),
+      sourcePage: str(body.sourcePage, 200), documentId: lead.documentId,
+    };
+
+    // Alert sales on WhatsApp and by email. A failed send must never lose the
+    // lead, so each is caught and only recorded on the entry.
+    const [notified, emailNotified] = await Promise.all([
+      strapi.service('api::lead.lead').notify(submission).catch((err: unknown) => {
         strapi.log.error(`lead: WhatsApp notification failed – ${err instanceof Error ? err.message : err}`);
         return false;
-      });
+      }),
+      sendSalesEmail(strapi, submission, { label: 'Yhteydenotto', uid: 'api::lead.lead' }).catch((err: unknown) => {
+        strapi.log.error(`lead: email notification failed – ${err instanceof Error ? err.message : err}`);
+        return false;
+      }),
+    ]);
 
-    if (notified) {
-      await strapi.documents('api::lead.lead').update({ documentId: lead.documentId, data: { notified: true } as any });
+    if (notified || emailNotified) {
+      await strapi.documents('api::lead.lead').update({ documentId: lead.documentId, data: { notified, emailNotified } as any });
     }
 
     // The site tells the visitor whether the message already reached us, and
