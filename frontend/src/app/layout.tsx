@@ -34,6 +34,17 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const FX_SCRIPT = `(function(){try{var d=document.documentElement;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;var s=window.CSS&&CSS.supports;if(s&&CSS.supports('animation-timeline: view()')&&CSS.supports('animation-timeline: scroll()')&&!/[?&]fx=io/.test(location.search)){d.classList.add('fx-sda')}else if('IntersectionObserver' in window){d.classList.add('fx-io');setTimeout(function(){if(!d.classList.contains('fx-ready'))d.classList.remove('fx-io')},4000)}}catch(e){}})();`;
 
+/*
+ * Browser translators (Google Translate, Edge, Safari) swap each text node for
+ * <font> wrappers behind React's back. The next time React removes or inserts
+ * next to one of those originals -- a button label changing to "Lähetetään…",
+ * a form step swapping -- the DOM throws NotFoundError and the error boundary
+ * replaces the page. Letting those two calls skip a node that is no longer
+ * where React left it keeps the site usable while translated.
+ * https://github.com/facebook/react/issues/11538
+ */
+const TRANSLATE_GUARD = `(function(){if(typeof Node!=='function'||!Node.prototype)return;var r=Node.prototype.removeChild;Node.prototype.removeChild=function(c){if(c.parentNode!==this)return c;return r.apply(this,arguments)};var i=Node.prototype.insertBefore;Node.prototype.insertBefore=function(n,ref){if(ref&&ref.parentNode!==this)return i.call(this,n,null);return i.apply(this,arguments)}})();`;
+
 export const viewport: Viewport = { themeColor: '#16263D', width: 'device-width', initialScale: 1, viewportFit: 'cover' };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -46,6 +57,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         {/* Picks the scroll-animation engine before first paint (see globals.css "Scroll animations"). */}
         <script dangerouslySetInnerHTML={{ __html: FX_SCRIPT }} />
+        {/* Must run before React touches the DOM (see TRANSLATE_GUARD). */}
+        <script dangerouslySetInnerHTML={{ __html: TRANSLATE_GUARD }} />
       </head>
       <body>
         <a className="skip" href="#main">Siirry sisältöön</a>
