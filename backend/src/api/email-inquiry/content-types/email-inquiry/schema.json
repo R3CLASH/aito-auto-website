@@ -60,6 +60,10 @@
       "type": "boolean",
       "default": false
     },
+    "whatsappNotified": {
+      "type": "boolean",
+      "default": false
+    },
     "internalNotes": {
       "type": "text"
     }

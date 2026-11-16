@@ -90,10 +90,19 @@ export default factories.createCoreController('api::email-inquiry.email-inquiry'
         return false;
       });
 
-    if (notified) {
+    // Every form submission also reaches sales on WhatsApp (see the lead service).
+    const whatsappNotified = await strapi
+      .service('api::lead.lead')
+      .notify({ ...data, carDetails: str(body.carDetails, 300), topic: ['Sähköpostikysely', data.topic].filter(Boolean).join(' – ') })
+      .catch((err: unknown) => {
+        strapi.log.error(`email-inquiry: WhatsApp notification failed – ${err instanceof Error ? err.message : err}`);
+        return false;
+      });
+
+    if (notified || whatsappNotified) {
       await strapi.documents('api::email-inquiry.email-inquiry').update({
         documentId: inquiry.documentId,
-        data: { notified: true } as any,
+        data: { notified, whatsappNotified } as any,
       });
     }
 

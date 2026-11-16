@@ -102,7 +102,7 @@ export default function ContactForm({ title, intro, consent, successTitle, succe
             {status === 'error' ? <p className="form-error full" role="alert">{serverError || 'Lähetys epäonnistui.'} Voit myös lähettää viestin WhatsAppissa.</p> : null}
             <div className="actions full">
               <button className="btn btn-navy cut btn-lg" type="submit" disabled={status === 'sending'}>
-                {status === 'sending' ? 'Lähetetään…' : <>Lähetä viesti <Arrow /></>}
+                {status === 'sending' ? <span key="s">Lähetetään…</span> : <span key="i">Lähetä viesti <Arrow /></span>}
               </button>
               <a className="btn btn-outline-wa btn-lg" href={waLink(whatsappNumber, waText)} target="_blank" rel="noopener noreferrer">tai lähetä WhatsAppiin</a>
             </div>

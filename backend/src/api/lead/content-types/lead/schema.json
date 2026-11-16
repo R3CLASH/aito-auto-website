@@ -64,6 +64,10 @@
       "default": "new",
       "required": true
     },
+    "notified": {
+      "type": "boolean",
+      "default": false
+    },
     "internalNotes": {
       "type": "text"
     }

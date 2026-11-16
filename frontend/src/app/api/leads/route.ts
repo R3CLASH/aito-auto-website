@@ -2,7 +2,10 @@ import { NextResponse } from 'next/server';
 
 const STRAPI_URL = (process.env.STRAPI_URL || 'http://localhost:1337').replace(/\/$/, '');
 
-/** Forwards contact-form and WhatsApp leads to Strapi with the shared secret. */
+/**
+ * Forwards contact-form and WhatsApp leads to Strapi with the shared secret.
+ * `notified` says whether Strapi already messaged sales on WhatsApp.
+ */
 export async function POST(req: Request) {
   let body: any;
   try {
@@ -25,7 +28,7 @@ export async function POST(req: Request) {
     if (!res.ok) {
       return NextResponse.json({ error: data?.error?.message || 'Lähetys epäonnistui' }, { status: res.status });
     }
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, notified: data?.notified === true });
   } catch {
     return NextResponse.json({ error: 'Palvelin ei vastaa juuri nyt' }, { status: 502 });
   }

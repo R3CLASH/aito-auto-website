@@ -108,8 +108,10 @@ export default function SellCarForm({ title, consent, successTitle, successText 
         <span data-on={step === 2 || undefined}><b>2</b> Yhteystiedot</span>
       </div>
 
+      {/* Keyed so a step change swaps the whole form instead of rewriting labels
+          in place, which a browser translator's copies of the text would hide. */}
       {step === 1 ? (
-        <form onSubmit={next} noValidate>
+        <form key="car" onSubmit={next} noValidate>
           <h2 className="d" ref={headRef} tabIndex={-1}>{title}</h2>
           <p className="sell-lead">Vaihe 1/2 – kerro autosta. Pakolliset kentät on merkitty tähdellä.</p>
           <div className="form-grid">
@@ -142,7 +144,7 @@ export default function SellCarForm({ title, consent, successTitle, successText 
           </div>
         </form>
       ) : (
-        <form onSubmit={submit} noValidate>
+        <form key="contact" onSubmit={submit} noValidate>
           <h2 className="d" ref={headRef} tabIndex={-1}>Minne tarjous lähetetään?</h2>
           <p className="sell-lead">Vaihe 2/2 – <strong>{[tradeIn, carTitle].filter(Boolean).join(' · ')}</strong>{' '}
             <button className="link-btn" type="button" onClick={() => goTo(1)}>Muokkaa</button>
@@ -174,7 +176,7 @@ export default function SellCarForm({ title, consent, successTitle, successText 
             <div className="actions full">
               <button className="btn btn-outline btn-lg" type="button" onClick={() => goTo(1)}><ArrowLeft /> Takaisin</button>
               <button className="btn btn-navy cut btn-lg" type="submit" disabled={status === 'sending'}>
-                {status === 'sending' ? 'Lähetetään…' : <>Pyydä tarjous <Arrow /></>}
+                {status === 'sending' ? <span key="s">Lähetetään…</span> : <span key="i">Pyydä tarjous <Arrow /></span>}
               </button>
             </div>
             <button className="link-btn full sell-wa" type="button" onClick={openWa}>tai lähetä tiedot WhatsAppissa</button>

@@ -76,6 +76,8 @@ h1, h2, h3, p { margin: 0; }
   transition: background .2s, color .2s, box-shadow .2s;
 }
 .btn svg { transition: transform .3s var(--ease); flex: none; }
+/* Labels that swap ("Lähetetään…") sit in their own span; keep the icon spacing. */
+.btn > span:only-child { display: inline-flex; align-items: center; gap: 12px; }
 .btn:hover svg { transform: translateX(5px); }
 .btn-azure { background: var(--azure-d); color: #fff; }
 .btn-azure:hover { background: var(--azure-t); color: #fff; }

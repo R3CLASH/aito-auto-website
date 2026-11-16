@@ -80,6 +80,24 @@ export default factories.createCoreController('api::lead.lead', ({ strapi }) => 
       } as any,
     });
 
-    ctx.send({ ok: true, id: lead.documentId });
+    // Message sales on WhatsApp. A failed send must never lose the lead, so it
+    // is caught and only recorded on the entry via `notified`.
+    const notified = await strapi
+      .service('api::lead.lead')
+      .notify({ name, phone, email, topic: str(body.topic, 80), message: str(body.message, 4000),
+        carTitle: str(body.carTitle, 200), carDetails: str(body.carDetails, 300), tradeIn: str(body.tradeIn, 200),
+        sourcePage: str(body.sourcePage, 200) })
+      .catch((err: unknown) => {
+        strapi.log.error(`lead: WhatsApp notification failed – ${err instanceof Error ? err.message : err}`);
+        return false;
+      });
+
+    if (notified) {
+      await strapi.documents('api::lead.lead').update({ documentId: lead.documentId, data: { notified: true } as any });
+    }
+
+    // The site tells the visitor whether the message already reached us, and
+    // offers the WhatsApp link only when it did not.
+    ctx.send({ ok: true, id: lead.documentId, notified });
   },
 }));
