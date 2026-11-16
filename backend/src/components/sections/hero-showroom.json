@@ -29,13 +29,15 @@
       "component": "shared.link",
       "repeatable": false
     },
-    "showroomLabel": {
-      "type": "string",
-      "default": "Näyttelytila"
+    "buyCta": {
+      "type": "component",
+      "component": "shared.link",
+      "repeatable": false
     },
-    "plateText": {
-      "type": "string",
-      "maxLength": 8
+    "sellCta": {
+      "type": "component",
+      "component": "shared.link",
+      "repeatable": false
     }
   }
 }

@@ -215,7 +215,7 @@ export const pages = [
       { __component: 'sections.hero-showroom', eyebrow: 'Vaihtoautoliike · [Kaupunki]', titleLine1: 'Aito auto.', titleLine2: 'Aito hinta.',
         description: 'Huolella valitut vaihtoautot, selkeät hinnat ja rahoitus, jonka kuukausierän näet heti. Ei piilokuluja, ei yllätyksiä.',
         primaryCta: { label: 'Selaa autoja', url: '/autot' }, secondaryCta: { label: 'Laske kuukausierä', url: '/autot' },
-        showroomLabel: 'Näyttelytila', plateText: 'AIT-024' },
+        buyCta: { label: 'Osta auto', url: '/autot' }, sellCta: { label: 'Myy auto', url: '/myy-auto' } },
       { __component: 'sections.quick-search', title: 'Löydä autosi kolmella valinnalla', hint: 'Tyyppi → Merkki → Malli', buttonLabel: 'Näytä autot' },
       { __component: 'sections.statement', term: 'aito /ˈɑi̯to/', definition: 'adj. oikea, väärentämätön',
         text: 'Nimemme on lupaus. Jokaisen auton historia tarkistetaan, kunto kerrotaan suoraan ja hinta on', highlight: 'se mikä lukee', muted: '– ilman kikkailua.' },

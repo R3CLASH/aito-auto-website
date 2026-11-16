@@ -11,6 +11,38 @@ const STRAPI_URL = (process.env.STRAPI_URL || 'http://localhost:1337').replace(/
 const TOKEN = process.env.STRAPI_API_TOKEN;
 export const CACHE_TAG = 'strapi';
 
+/**
+ * Strapi rejects the whole request when it is asked for a field or relation it
+ * does not have yet, so a schema the CMS has not deployed takes every page down
+ * rather than just the value that is missing. The two services deploy from one
+ * push but never land together, so that window is routine. Drop the key Strapi
+ * named and ask again; the mapping below already treats every new field as
+ * optional, so the page renders without it until the CMS catches up.
+ */
+const INVALID_KEY = /Invalid key ([A-Za-z0-9_]+)/;
+
+function withoutKey(query: Record<string, unknown>, key: string): Record<string, unknown> | null {
+  let dropped = false;
+  const strip = (node: unknown): unknown => {
+    if (Array.isArray(node)) {
+      const kept = node.filter((v) => v !== key);
+      if (kept.length !== node.length) dropped = true;
+      return kept.map(strip);
+    }
+    if (node && typeof node === 'object') {
+      const out: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(node)) {
+        if (k === key) { dropped = true; continue; }
+        out[k] = strip(v);
+      }
+      return out;
+    }
+    return node;
+  };
+  const next = strip(query) as Record<string, unknown>;
+  return dropped ? next : null;
+}
+
 async function api<T = any>(path: string, query: Record<string, unknown> = {}): Promise<T> {
   const q = qs.stringify(query, { encodeValuesOnly: true });
   const url = `${STRAPI_URL}/api/${path}${q ? `?${q}` : ''}`;
@@ -24,6 +56,14 @@ async function api<T = any>(path: string, query: Record<string, unknown> = {}): 
   if (res.status === 404) return { data: null } as T;
   if (!res.ok) {
     const text = await res.text().catch(() => '');
+    const unknown = res.status === 400 ? text.match(INVALID_KEY)?.[1] : undefined;
+    if (unknown) {
+      const retry = withoutKey(query, unknown);
+      if (retry) {
+        console.warn(`Strapi has no "${unknown}" yet on ${path}; retrying without it.`);
+        return api<T>(path, retry);
+      }
+    }
     throw new Error(`Strapi ${res.status} on ${path}: ${text.slice(0, 300)}`);
   }
   return res.json();
@@ -295,7 +335,7 @@ export const getCarBySlug = cache(async (slug: string): Promise<CarDetail | null
 /* ------------------------------------------------------------------ pages */
 
 const SECTION_POPULATE: Record<string, unknown> = {
-  'sections.hero-showroom': { populate: { primaryCta: true, secondaryCta: true } },
+  'sections.hero-showroom': { populate: { primaryCta: true, secondaryCta: true, buyCta: true, sellCta: true } },
   'sections.quick-search': true,
   'sections.statement': true,
   'sections.brand-ticker': true,

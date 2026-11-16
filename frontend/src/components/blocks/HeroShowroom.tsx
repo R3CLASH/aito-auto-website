@@ -1,23 +1,14 @@
-'use client';
-
-import Image from 'next/image';
-import Link from 'next/link';
-import { useState } from 'react';
-import { Arrow, CarOutline } from '../Icons';
+import { Arrow } from '../Icons';
 import SmartLink from '../SmartLink';
-import { two } from '@/lib/format';
 
-export type ShowroomTab = {
-  slug: string;
-  label: string;
-  count: number;
-  from: number | null;
-  image: { url: string; width: number; height: number } | null;
-};
-
-export default function HeroShowroom({ block, tabs }: { block: any; tabs: ShowroomTab[] }) {
-  const [i, setI] = useState(0);
-  const cur = tabs[i];
+/**
+ * The hero's right-hand column. It used to be a showroom turntable that cycled
+ * the vehicle types; it now carries the two decisions a visitor actually
+ * arrives with -- buying or selling -- as full-size panels.
+ */
+export default function HeroShowroom({ block, carCount }: { block: any; carCount: number }) {
+  const buy = block.buyCta?.url ? block.buyCta : { label: 'Osta auto', url: '/autot' };
+  const sell = block.sellCta?.url ? block.sellCta : { label: 'Myy auto', url: '/myy-auto' };
 
   return (
     <section className="hero">
@@ -35,43 +26,25 @@ export default function HeroShowroom({ block, tabs }: { block: any; tabs: Showro
           </div>
         </div>
 
-        {cur ? (
-          <div className="show">
-            <div className="show-top"><span>{block.showroomLabel || 'Näyttelytila'}</span><span>{two(i + 1)} / {two(tabs.length)}</span></div>
-            <div className="stage">
-              <div className="d drift stage-word" aria-hidden="true">{cur.label}</div>
-              <svg className="turntable" viewBox="0 0 400 90" aria-hidden="true">
-                <ellipse cx="200" cy="45" rx="190" ry="34" fill="rgba(255,255,255,.08)" />
-                <g transform="translate(200 45) scale(1 .18)">
-                  <circle className="spin" cx="0" cy="0" r="186" fill="none" stroke="rgba(255,255,255,.55)" strokeWidth="7" strokeDasharray="28 22" />
-                </g>
-              </svg>
-              <div className="stage-car" key={cur.slug}>
-                {cur.image ? (
-                  <Image className="drive" src={cur.image.url} alt={cur.label} width={cur.image.width} height={cur.image.height} priority sizes="(max-width: 900px) 92vw, 560px" />
-                ) : (
-                  <CarOutline className="drive" />
-                )}
-              </div>
-            </div>
-            <div className="tabs" role="group" aria-label="Valitse ajoneuvotyyppi">
-              {tabs.map((t, n) => (
-                <button key={t.slug} type="button" className="tab" aria-pressed={n === i} onClick={() => setI(n)}>
-                  <span className="m">{two(n + 1)}</span>
-                  <b>{t.label}</b>
-                </button>
-              ))}
-            </div>
-            <Link className="rd" href={`/autot?tyyppi=${cur.slug}`}>
-              <i>FIN</i>
-              <span className="rd-mid">
-                <span className="d">{cur.count} {cur.count === 1 ? 'auto' : 'autoa'}</span>
-                {cur.from ? <span><span className="m" style={{ fontSize: 12, color: 'var(--muted)' }}>alk. </span><strong>{cur.from} €/kk</strong></span> : null}
-              </span>
-              <span className="rd-go" aria-hidden="true">→</span>
-            </Link>
-          </div>
-        ) : null}
+        {/* A fork in the road, drawn the way Finnish direction signs are: blue
+            plates with an arrow end, a white supplementary plate underneath,
+            both bolted to one post. Buying points on, selling points back. */}
+        <nav className="hero-nav" aria-label="Osta tai myy">
+          <span className="post" aria-hidden="true" />
+          <SmartLink className="sign sign-buy" href={buy.url}>
+            <span className="sign-plate">
+              <span className="sign-t d">{buy.label}</span>
+              <span className="sign-n d">{carCount}<small> {carCount === 1 ? 'auto' : 'autoa'}</small></span>
+            </span>
+            <span className="sign-sub">Valmiina pihassa</span>
+          </SmartLink>
+          <SmartLink className="sign sign-sell" href={sell.url}>
+            <span className="sign-plate">
+              <span className="sign-t d">{sell.label}</span>
+            </span>
+            <span className="sign-sub">Kerro autostasi, saat tarjouksen</span>
+          </SmartLink>
+        </nav>
       </div>
     </section>
   );

@@ -1,7 +1,7 @@
 import type { Block, SiteContext } from '@/lib/types';
 import { getServices } from '@/lib/strapi';
 import * as S from './blocks/Sections';
-import HeroShowroom, { type ShowroomTab } from './blocks/HeroShowroom';
+import HeroShowroom from './blocks/HeroShowroom';
 import QuickSearch from './blocks/QuickSearch';
 import Faq from './blocks/Faq';
 import ServicesDetail from './blocks/ServicesDetail';
@@ -9,19 +9,6 @@ import ContactHub from './blocks/ContactHub';
 import InventoryBrowser from './blocks/InventoryBrowser';
 
 export type RouteFilter = { type: string; brand: string; model: string };
-
-function showroomTabs(ctx: SiteContext): ShowroomTab[] {
-  return ctx.catalog.types.map((t) => {
-    const inType = ctx.catalog.cars.filter((c) => c.type?.slug === t.slug);
-    return {
-      slug: t.slug,
-      label: t.shortName || t.name,
-      count: inType.length,
-      from: inType.length ? Math.min(...inType.map((c) => c.monthly)) : null,
-      image: t.silhouette ? { url: t.silhouette.url, width: t.silhouette.width, height: t.silhouette.height } : null,
-    };
-  });
-}
 
 function quickSearchData(ctx: SiteContext) {
   return {
@@ -45,7 +32,7 @@ export default async function BlockRenderer({ blocks, ctx, filter }: { blocks: B
         const key = `${block.__component}-${block.id}`;
         const p = { block, ctx };
         switch (block.__component) {
-          case 'sections.hero-showroom': return <HeroShowroom key={key} block={block} tabs={showroomTabs(ctx)} />;
+          case 'sections.hero-showroom': return <HeroShowroom key={key} block={block} carCount={ctx.catalog.cars.length} />;
           case 'sections.quick-search': return <QuickSearch key={key} block={block} data={quickSearchData(ctx)} />;
           case 'sections.statement': return <S.Statement key={key} {...p} />;
           case 'sections.brand-ticker': return <S.BrandTicker key={key} {...p} />;
