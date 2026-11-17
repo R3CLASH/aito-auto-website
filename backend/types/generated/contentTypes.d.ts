@@ -497,7 +497,6 @@ export interface ApiCarDetailPageCarDetailPage extends Struct.SingleTypeSchema {
         'sections.vehicle-types-grid',
         'sections.latest-cars',
         'sections.process-road',
-        'sections.finance-teaser',
         'sections.services-list',
         'sections.cta-banner',
         'sections.page-header',
@@ -615,6 +614,7 @@ export interface ApiCarCar extends Struct.CollectionTypeSchema {
     fuel: Schema.Attribute.Enumeration<
       [
         'Bensiini',
+        'Bensiini/S\u00E4hk\u00F6',
         'Diesel',
         'Hybridi',
         'Lataushybridi',
@@ -634,6 +634,13 @@ export interface ApiCarCar extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     mileage: Schema.Attribute.Integer &
       Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    monthlyInstallment: Schema.Attribute.Integer &
       Schema.Attribute.SetMinMax<
         {
           min: 0;
@@ -688,6 +695,70 @@ export interface ApiCarCar extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiComplaintComplaint extends Struct.CollectionTypeSchema {
+  collectionName: 'complaints';
+  info: {
+    displayName: 'Reklamaatio (Complaint)';
+    pluralName: 'complaints';
+    singularName: 'complaint';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.Text & Schema.Attribute.Required;
+    email: Schema.Attribute.Email & Schema.Attribute.Required;
+    emailNotified: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    faultStarted: Schema.Attribute.Date;
+    internalNotes: Schema.Attribute.Text;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::complaint.complaint'
+    > &
+      Schema.Attribute.Private;
+    mileageAtPurchase: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    mileageNow: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    notified: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    phone: Schema.Attribute.String & Schema.Attribute.Required;
+    photos: Schema.Attribute.Media<'images', true>;
+    plate: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    purchaseDate: Schema.Attribute.Date;
+    repairsDone: Schema.Attribute.Text;
+    resolution: Schema.Attribute.Enumeration<
+      ['korjaus', 'hinnanalennus', 'kaupan-purku', 'ei-tiedossa']
+    > &
+      Schema.Attribute.DefaultTo<'ei-tiedossa'>;
+    salesperson: Schema.Attribute.String;
+    sourcePage: Schema.Attribute.String;
+    status: Schema.Attribute.Enumeration<
+      ['new', 'investigating', 'resolved', 'rejected']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'new'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiEmailInquiryEmailInquiry
   extends Struct.CollectionTypeSchema {
   collectionName: 'email_inquiries';
@@ -728,6 +799,8 @@ export interface ApiEmailInquiryEmailInquiry
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    whatsappNotified: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
   };
 }
 
@@ -854,12 +927,14 @@ export interface ApiLeadLead extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     email: Schema.Attribute.Email;
+    emailNotified: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     internalNotes: Schema.Attribute.Text;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::lead.lead'> &
       Schema.Attribute.Private;
     message: Schema.Attribute.Text;
     name: Schema.Attribute.String & Schema.Attribute.Required;
+    notified: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     phone: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     sourcePage: Schema.Attribute.String;
@@ -894,7 +969,6 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.vehicle-types-grid',
         'sections.latest-cars',
         'sections.process-road',
-        'sections.finance-teaser',
         'sections.services-list',
         'sections.cta-banner',
         'sections.page-header',
@@ -907,6 +981,8 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'sections.team',
         'sections.visit-cta',
         'sections.contact-hub',
+        'sections.sell-car',
+        'sections.complaint-form',
         'sections.rich-text',
       ]
     >;
@@ -1513,6 +1589,7 @@ declare module '@strapi/strapi' {
       'api::car-detail-page.car-detail-page': ApiCarDetailPageCarDetailPage;
       'api::car-model.car-model': ApiCarModelCarModel;
       'api::car.car': ApiCarCar;
+      'api::complaint.complaint': ApiComplaintComplaint;
       'api::email-inquiry.email-inquiry': ApiEmailInquiryEmailInquiry;
       'api::finance-setting.finance-setting': ApiFinanceSettingFinanceSetting;
       'api::global.global': ApiGlobalGlobal;

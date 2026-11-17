@@ -17,7 +17,11 @@ export type Submission = {
   tradeIn?: string;
   sourcePage?: string;
   documentId?: string;
+  /** Extra labelled rows for the request section (e.g. a complaint's car details). */
+  rows?: [string, string][];
 };
+
+export type Attachment = { filename: string; content: Buffer; contentType?: string };
 
 export type Kind = {
   /** "Sähköpostikysely", "Yhteydenotto" … shown in the subject and header. */
@@ -64,7 +68,9 @@ export function salesEmail(s: Submission, kind: Kind, urls: { site?: string; cms
   const adminUrl = cms && s.documentId ? `${cms}/admin/content-manager/collection-types/${kind.uid}/${s.documentId}` : '';
   const selling = s.topic === 'Myy auto';
   const tradeInLabel = selling ? 'Myytävä auto' : 'Vaihtoauto';
-  const what = selling
+  const what = s.topic === 'Reklamaatio'
+    ? s.rows?.find(([k]) => k === 'Rekisterinumero')?.[1] || 'Reklamaatio'
+    : selling
     ? ['Myy auto', s.carTitle || s.tradeIn].filter(Boolean).join(': ')
     : s.carTitle || s.topic || 'Verkkosivut';
   const subject = `${kind.label}: ${what} – ${s.name}`;
@@ -83,6 +89,7 @@ export function salesEmail(s: Submission, kind: Kind, urls: { site?: string; cms
     s.carTitle ? `Auto: ${s.carTitle}` : null,
     s.carDetails ? `Tiedot: ${s.carDetails}` : null,
     s.tradeIn ? `${tradeInLabel}: ${s.tradeIn}` : null,
+    ...(s.rows || []).map(([k, v]) => `${k}: ${v}`),
     pageUrl ? `Sivu: ${pageUrl}` : null,
     '',
     'Viesti:',
@@ -114,6 +121,7 @@ export function salesEmail(s: Submission, kind: Kind, urls: { site?: string; cms
       ${row('Auto', s.carTitle)}
       ${row('Tiedot', s.carDetails)}
       ${row(tradeInLabel, s.tradeIn)}
+      ${(s.rows || []).map(([k, v]) => row(esc(k), v)).join('')}
       ${row('Sivu', pageUrl, pageUrl ? link(pageUrl, s.sourcePage || pageUrl) : undefined)}
     </table>
   </td></tr>
@@ -139,7 +147,7 @@ export function salesEmail(s: Submission, kind: Kind, urls: { site?: string; cms
  * address in Yleiset asetukset (Global) when that is unset. Returns false when
  * no recipient is configured, so the caller can record it; throws on send errors.
  */
-export async function sendSalesEmail(strapi: Core.Strapi, s: Submission, kind: Kind) {
+export async function sendSalesEmail(strapi: Core.Strapi, s: Submission, kind: Kind, attachments: Attachment[] = []) {
   let to = process.env.INQUIRY_NOTIFY_TO;
   if (!to) {
     const global = await strapi.documents('api::global.global').findFirst({ fields: ['email'] as any });
@@ -157,6 +165,7 @@ export async function sendSalesEmail(strapi: Core.Strapi, s: Submission, kind: K
     subject,
     text,
     html,
+    ...(attachments.length ? { attachments } : {}),
   });
 
   strapi.log.info(`sales email: ${kind.label} sent to ${to}`);

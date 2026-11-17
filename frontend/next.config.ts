@@ -9,6 +9,9 @@ const extraHosts = (process.env.IMAGE_HOSTS || '')
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  async redirects() {
+    return [{ source: '/complaints', destination: '/reklamaatiot', permanent: true }];
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
     // Media is served by app/uploads/[...path], so it is same-origin.

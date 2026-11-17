@@ -8,6 +8,7 @@ import ServicesDetail from './blocks/ServicesDetail';
 import ContactHub from './blocks/ContactHub';
 import InventoryBrowser from './blocks/InventoryBrowser';
 import SellCar from './blocks/SellCar';
+import ComplaintForm from './blocks/ComplaintForm';
 
 export type RouteFilter = { type: string; brand: string; model: string };
 
@@ -53,6 +54,7 @@ export default async function BlockRenderer({ blocks, ctx, filter }: { blocks: B
           case 'sections.services-detail': return <ServicesDetail key={key} block={block} services={services} />;
           case 'sections.contact-hub': return <ContactHub key={key} {...p} />;
           case 'sections.sell-car': return <SellCar key={key} block={block} />;
+          case 'sections.complaint-form': return <ComplaintForm key={key} block={block} />;
           case 'sections.inventory-browser':
             return <InventoryBrowser key={key} block={block} catalog={ctx.catalog} initial={filter || { type: '', brand: '', model: '' }} />;
           default:

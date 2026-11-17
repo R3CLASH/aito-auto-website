@@ -1,0 +1,42 @@
+{
+  "kind": "collectionType",
+  "collectionName": "complaints",
+  "info": {
+    "singularName": "complaint",
+    "pluralName": "complaints",
+    "displayName": "Reklamaatio (Complaint)"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": { "type": "string", "required": true },
+    "phone": { "type": "string", "required": true },
+    "email": { "type": "email", "required": true },
+    "plate": { "type": "string", "required": true },
+    "purchaseDate": { "type": "date" },
+    "salesperson": { "type": "string" },
+    "mileageAtPurchase": { "type": "integer", "min": 0 },
+    "mileageNow": { "type": "integer", "min": 0 },
+    "faultStarted": { "type": "date" },
+    "description": { "type": "text", "required": true },
+    "repairsDone": { "type": "text" },
+    "resolution": {
+      "type": "enumeration",
+      "enum": ["korjaus", "hinnanalennus", "kaupan-purku", "ei-tiedossa"],
+      "default": "ei-tiedossa"
+    },
+    "photos": { "type": "media", "multiple": true, "allowedTypes": ["images"] },
+    "sourcePage": { "type": "string" },
+    "status": {
+      "type": "enumeration",
+      "enum": ["new", "investigating", "resolved", "rejected"],
+      "default": "new",
+      "required": true
+    },
+    "notified": { "type": "boolean", "default": false },
+    "emailNotified": { "type": "boolean", "default": false },
+    "internalNotes": { "type": "text" }
+  }
+}

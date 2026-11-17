@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_sections_complaint_forms",
+  "info": {
+    "displayName": "Reklamaatiolomake (Complaint form)",
+    "icon": "feather"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "default": "Reklamaatiolomake"
+    },
+    "intro": {
+      "type": "text"
+    },
+    "consentText": {
+      "type": "text"
+    },
+    "successTitle": {
+      "type": "string",
+      "default": "Reklamaatio vastaanotettu"
+    },
+    "successText": {
+      "type": "text"
+    }
+  }
+}

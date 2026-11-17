@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "arial",
+        "createdAt": "2026-11-17T17:19:20.539Z",
+        "reason": "Claude: HTML email in backend/src/notifications/sales-email.ts must use a system font stack; mail clients cannot load the site's web fonts"
+      }
+    ]
+  }
+}

@@ -1,5 +1,6 @@
 import type { Core } from '@strapi/strapi';
 import { seed } from './seed';
+import { applyContentUpdates } from './seed/content-updates';
 import { applyAdminLayouts, registerValidation } from './admin-setup';
 
 /** Content types the website reads without authentication. */
@@ -59,10 +60,12 @@ function registerRevalidation(strapi: Core.Strapi) {
     }, 800);
   };
 
+  // Form submissions are not site content.
+  const SUBMISSIONS = new Set(['api::lead.lead', 'api::email-inquiry.email-inquiry', 'api::complaint.complaint']);
   const WRITE_ACTIONS = new Set(['create', 'update', 'delete', 'publish', 'unpublish', 'discardDraft']);
   strapi.documents.use(async (ctx, next) => {
     const result = await next();
-    if (WRITE_ACTIONS.has(ctx.action) && ctx.uid.startsWith('api::') && ctx.uid !== 'api::lead.lead') ping();
+    if (WRITE_ACTIONS.has(ctx.action) && ctx.uid.startsWith('api::') && !SUBMISSIONS.has(ctx.uid)) ping();
     return result;
   });
 }
@@ -77,15 +80,17 @@ export default {
     await grantPublicRead(strapi);
     await applyAdminLayouts(strapi);
 
-    if (process.env.SEED_DEMO_DATA === 'false') return;
     const hasGlobal = await strapi.db.query('api::global.global').count();
     const hasPages = await strapi.db.query('api::page.page').count();
     if (!hasGlobal && !hasPages) {
+      if (process.env.SEED_DEMO_DATA === 'false') return;
       try {
         await seed(strapi);
       } catch (e) {
         strapi.log.error(`[seed] Failed: ${(e as Error).stack}`);
       }
+      return;
     }
+    await applyContentUpdates(strapi);
   },
 };

@@ -4,8 +4,10 @@
  * Strapi admin. Text in [brackets] is a placeholder to replace with real info.
  */
 
+import { complaintsPage, complaintsService, privacyBody } from './legal';
+
 const p = (text: string) => ({ type: 'paragraph', children: [{ type: 'text', text }] });
-const h = (text: string, level = 2) => ({ type: 'heading', level, children: [{ type: 'text', text }] });
+
 
 export const vehicleTypes = [
   { name: 'Henkilöauto', shortName: 'Henkilöauto', slug: 'henkiloauto', order: 1, image: 'sedan.png' },
@@ -204,6 +206,7 @@ export const services = [
   { title: 'Rekisteröinti & vakuutus', slug: 'rekisterointi-ja-vakuutus', order: 6, special: 'none',
     summary: 'Paperit hoidettuna puolestasi.',
     body: 'Hoidamme omistajanvaihdoksen ja rekisteröinnin puolestasi. Liikennevakuutuksen voi järjestää samalla kertaa, joten auto on ajokunnossa heti.', facts: [] },
+  complaintsService,
 ];
 
 const ctaBanner = { __component: 'sections.cta-banner', title: 'Etsitkö jotain tiettyä?', highlight: 'Kerro – me etsimme.', buttonLabel: 'Lähetä toive WhatsAppiin', action: 'whatsapp' };
@@ -328,21 +331,13 @@ export const pages = [
         successTitle: 'Kiitos!', successText: 'Viestisi on vastaanotettu. Palaamme asiaan mahdollisimman pian.' },
     ],
   },
+  complaintsPage,
   {
     title: 'Tietosuojaseloste', slug: 'tietosuojaseloste',
     seo: { metaTitle: 'Tietosuojaseloste – Aito Auto Oy' },
     blocks: [
       { __component: 'sections.page-header', eyebrow: 'Tietosuoja', title: 'Tietosuojaseloste', variant: 'light' },
-      { __component: 'sections.rich-text', body: [
-        h('Rekisterinpitäjä'),
-        p('Aito Auto Oy, Y-tunnus [0000000-0], [Katuosoite], [Postinumero] [Kaupunki].'),
-        h('Mitä tietoja keräämme'),
-        p('Kun otat yhteyttä lomakkeella tai WhatsAppissa, tallennamme antamasi nimen, puhelinnumeron, sähköpostin, viestin sekä tiedot autosta tai laskelmasta, josta kysyt.'),
-        h('Käyttötarkoitus'),
-        p('Käytämme tietoja ainoastaan yhteydenottoosi vastaamiseen ja mahdollisen kaupan hoitamiseen. Emme luovuta tietoja kolmansille osapuolille ilman suostumustasi, lukuun ottamatta rahoitushakemuksia, jotka välitetään rahoittajalle pyynnöstäsi.'),
-        h('Säilytys ja oikeutesi'),
-        p('[Täydennä säilytysajat.] Sinulla on oikeus tarkastaa, korjata ja pyytää poistamaan tietosi ottamalla yhteyttä osoitteeseen [myynti@aitoauto.fi].'),
-      ] },
+      { __component: 'sections.rich-text', body: privacyBody },
     ],
   },
 ];

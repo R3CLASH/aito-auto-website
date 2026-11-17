@@ -872,6 +872,36 @@ h1, h2, h3, p { margin: 0; }
 .rt-sec { padding-top: 40px; padding-bottom: 100px; }
 .rt-sec .prose { max-width: 760px; }
 
+/* ---------- complaint form ---------- */
+.cmp-sec { padding-top: 24px; padding-bottom: 100px; border-top: 1px solid var(--line); }
+.cmp-head { max-width: 760px; padding-top: 56px; }
+.cmp-head h2 { color: var(--navy); }
+.cmp-head p { margin-top: 14px; font-size: 18px; line-height: 1.6; color: var(--body); }
+.cmp-card { margin-top: 32px; max-width: 880px; background: #fff; border: 1px solid var(--line); padding: 34px; display: grid; gap: 28px; }
+.cmp-card fieldset { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 14px; }
+.cmp-card legend { padding: 0; margin-bottom: 14px; display: flex; align-items: baseline; gap: 12px; font: 700 20px var(--f-body); color: var(--navy); }
+.cmp-card legend span { font: 13px var(--f-mono); color: var(--azure-t); }
+.cmp-card legend small { font: 12px var(--f-mono); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.cmp-card fieldset + fieldset { border-top: 1px solid var(--line); padding-top: 26px; }
+.cmp-card .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.cmp-card .field.invalid .plate-in { border-color: #b42318; }
+.cmp-label { display: block; font-size: 13px; font-weight: 600; color: var(--body); margin-bottom: 8px; }
+.cmp-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.cmp-opt { position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border: 1.5px solid var(--line-2); font-weight: 600; font-size: 14px; color: var(--ink); cursor: pointer; }
+.cmp-opt input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.cmp-opt[data-on] { background: var(--navy); border-color: var(--navy); color: #fff; }
+.cmp-opt:has(input:focus-visible) { outline: 3px solid var(--azure); outline-offset: 2px; }
+.cmp-hint { color: var(--muted); font-size: 14px; line-height: 1.5; }
+.cmp-files { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.cmp-files li { display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline; padding: 10px 12px; background: var(--bg); font-size: 14px; }
+.cmp-files li span:first-child { flex: 1 1 200px; min-width: 0; overflow-wrap: anywhere; }
+.cmp-files .m { font: 12px var(--f-mono); color: var(--muted); }
+.cmp-card label.btn { justify-self: start; cursor: pointer; }
+.cmp-card .sr-only:focus-visible + label.btn { outline: 3px solid var(--azure); outline-offset: 3px; }
+.cmp-done { justify-items: start; }
+.cmp-done h3 { font-size: 40px; color: var(--navy); }
+.cmp-done p { color: var(--body); line-height: 1.6; max-width: 560px; }
+
 /* ==========================================================================
    Motion
    ========================================================================== */
@@ -1045,6 +1075,8 @@ h1, h2, h3, p { margin: 0; }
   .sell::before { clip-path: polygon(0 0, 78% 0, 52% 260px, 0 260px); }
   .sell-in { padding-top: 48px; padding-bottom: 56px; }
   .sell-card { padding: 22px; }
+  .cmp-card { padding: 22px; }
+  .cmp-head { padding-top: 40px; }
   .sell-card h2 { font-size: 36px; }
   .ct-done .d { font-size: 80px; }
   .modal-head h2 { font-size: 32px; }

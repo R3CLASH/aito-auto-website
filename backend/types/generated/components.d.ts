@@ -29,6 +29,23 @@ export interface SectionsBrandTicker extends Struct.ComponentSchema {
   };
 }
 
+export interface SectionsComplaintForm extends Struct.ComponentSchema {
+  collectionName: 'components_sections_complaint_forms';
+  info: {
+    displayName: 'Reklamaatiolomake (Complaint form)';
+    icon: 'feather';
+  };
+  attributes: {
+    consentText: Schema.Attribute.Text;
+    intro: Schema.Attribute.Text;
+    successText: Schema.Attribute.Text;
+    successTitle: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Reklamaatio vastaanotettu'>;
+    title: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Reklamaatiolomake'>;
+  };
+}
+
 export interface SectionsContactHub extends Struct.ComponentSchema {
   collectionName: 'components_sections_contact_hubs';
   info: {
@@ -76,23 +93,6 @@ export interface SectionsFaq extends Struct.ComponentSchema {
   };
 }
 
-export interface SectionsFinanceTeaser extends Struct.ComponentSchema {
-  collectionName: 'components_sections_finance_teasers';
-  info: {
-    displayName: 'Rahoitusnosto (Finance teaser)';
-    icon: 'chartPie';
-  };
-  attributes: {
-    buttonLabel: Schema.Attribute.String;
-    buttonUrl: Schema.Attribute.String;
-    exampleLabel: Schema.Attribute.String;
-    examplePrice: Schema.Attribute.Integer;
-    eyebrow: Schema.Attribute.String;
-    text: Schema.Attribute.Text;
-    title: Schema.Attribute.String & Schema.Attribute.Required;
-  };
-}
-
 export interface SectionsHeroShowroom extends Struct.ComponentSchema {
   collectionName: 'components_sections_hero_showrooms';
   info: {
@@ -100,16 +100,12 @@ export interface SectionsHeroShowroom extends Struct.ComponentSchema {
     icon: 'landscape';
   };
   attributes: {
+    buyCta: Schema.Attribute.Component<'shared.link', false>;
     description: Schema.Attribute.Text;
     eyebrow: Schema.Attribute.String;
-    plateText: Schema.Attribute.String &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 8;
-      }>;
     primaryCta: Schema.Attribute.Component<'shared.link', false>;
     secondaryCta: Schema.Attribute.Component<'shared.link', false>;
-    showroomLabel: Schema.Attribute.String &
-      Schema.Attribute.DefaultTo<'N\u00E4yttelytila'>;
+    sellCta: Schema.Attribute.Component<'shared.link', false>;
     titleLine1: Schema.Attribute.String & Schema.Attribute.Required;
     titleLine2: Schema.Attribute.String;
   };
@@ -138,7 +134,6 @@ export interface SectionsInventoryBrowser extends Struct.ComponentSchema {
     icon: 'filter';
   };
   attributes: {
-    disclaimer: Schema.Attribute.Text;
     emptyText: Schema.Attribute.Text;
     emptyTitle: Schema.Attribute.String &
       Schema.Attribute.DefaultTo<'Ei juuri nyt myynniss\u00E4'>;
@@ -219,6 +214,26 @@ export interface SectionsRichText extends Struct.ComponentSchema {
   attributes: {
     body: Schema.Attribute.Blocks;
     title: Schema.Attribute.String;
+  };
+}
+
+export interface SectionsSellCar extends Struct.ComponentSchema {
+  collectionName: 'components_sections_sell_cars';
+  info: {
+    displayName: 'Myy auto \u2013 lomake (Sell car)';
+    icon: 'car';
+  };
+  attributes: {
+    consentText: Schema.Attribute.Text;
+    eyebrow: Schema.Attribute.String;
+    formTitle: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Pyyd\u00E4 ostotarjous'>;
+    intro: Schema.Attribute.Text;
+    points: Schema.Attribute.Component<'shared.step', true>;
+    successText: Schema.Attribute.Text;
+    successTitle: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Kiitos!'>;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 
@@ -476,10 +491,10 @@ declare module '@strapi/strapi' {
     export interface ComponentSchemas {
       'sections.about-hero': SectionsAboutHero;
       'sections.brand-ticker': SectionsBrandTicker;
+      'sections.complaint-form': SectionsComplaintForm;
       'sections.contact-hub': SectionsContactHub;
       'sections.cta-banner': SectionsCtaBanner;
       'sections.faq': SectionsFaq;
-      'sections.finance-teaser': SectionsFinanceTeaser;
       'sections.hero-showroom': SectionsHeroShowroom;
       'sections.image-band': SectionsImageBand;
       'sections.inventory-browser': SectionsInventoryBrowser;
@@ -488,6 +503,7 @@ declare module '@strapi/strapi' {
       'sections.process-road': SectionsProcessRoad;
       'sections.quick-search': SectionsQuickSearch;
       'sections.rich-text': SectionsRichText;
+      'sections.sell-car': SectionsSellCar;
       'sections.services-detail': SectionsServicesDetail;
       'sections.services-list': SectionsServicesList;
       'sections.statement': SectionsStatement;

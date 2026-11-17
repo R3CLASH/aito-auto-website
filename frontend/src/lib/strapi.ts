@@ -3,6 +3,7 @@ import qs from 'qs';
 import { cache } from 'react';
 import { monthlyPayment } from './finance';
 import { BUILTIN_PAGES, SELL_LINK } from './builtinPages';
+import { complaintsService } from './legal';
 import type {
   BrandNode, CarDetail, CarSummary, Catalog, FinanceSettings, GlobalSettings, Link, Media,
   PageData, ServiceItem, SocialLink, VehicleType, CarDetailTemplate,
@@ -365,6 +366,7 @@ const SECTION_POPULATE: Record<string, unknown> = {
   'sections.visit-cta': true,
   'sections.contact-hub': true,
   'sections.sell-car': { populate: { points: true } },
+  'sections.complaint-form': true,
   'sections.rich-text': true,
 };
 
@@ -401,7 +403,9 @@ export const getPageSlugs = cache(async (): Promise<string[]> => {
 });
 
 export const getServices = cache(async (): Promise<ServiceItem[]> => {
-  const all = await fetchAll('services', { sort: ['order:asc'], populate: { facts: true } });
+  const fetched = await fetchAll('services', { sort: ['order:asc'], populate: { facts: true } });
+  // The complaints entry stays listed until an editor adds it to Strapi.
+  const all = fetched.some((s: any) => s.slug === complaintsService.slug) ? fetched : [...fetched, complaintsService];
   return all.map((s: any) => ({
     title: s.title, slug: s.slug, summary: s.summary || '', body: s.body || '',
     facts: s.facts || [], special: s.special || 'none', ctaLabel: s.ctaLabel || '', ctaUrl: s.ctaUrl || '',

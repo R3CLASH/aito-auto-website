@@ -1,4 +1,5 @@
 import type { Link, PageData } from './types';
+import { complaintsPage } from './legal';
 
 /**
  * Pages the site serves before an editor has created them in Strapi. A Strapi
@@ -65,4 +66,5 @@ export const BUILTIN_PAGES: Record<string, PageData> = {
       }),
     ],
   },
+  reklamaatiot: { ...complaintsPage, blocks: complaintsPage.blocks.map((block) => b(block.__component, block)) },
 };
