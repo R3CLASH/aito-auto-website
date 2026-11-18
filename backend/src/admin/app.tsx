@@ -1,4 +1,5 @@
 import type { StrapiApp } from '@strapi/strapi/admin';
+import { Download } from '@strapi/icons';
 
 /**
  * Keep browser translation (Chrome/Edge "Translate this page", the Google
@@ -71,6 +72,18 @@ export default {
     // Profile -> Interface language is cleaner than translating the English one
     // in the browser, and it leaves the DOM alone entirely.
     locales: ['fi'],
+  },
+  register(app: StrapiApp) {
+    // "Vie autot" in the main sidebar: the whole catalogue as a CSV. The page
+    // behind it downloads through the admin's own fetch client, so the export
+    // endpoint sees a logged-in admin.
+    app.addMenuLink({
+      to: 'car-export',
+      icon: Download,
+      intlLabel: { id: 'car-export.menu.label', defaultMessage: 'Vie autot (CSV)' },
+      Component: () => import('./pages/CarExport').then((mod) => ({ default: mod.default })),
+      permissions: [],
+    });
   },
   bootstrap(_app: StrapiApp) {
     guardDomAgainstTranslation();
