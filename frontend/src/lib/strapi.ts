@@ -2,6 +2,7 @@ import 'server-only';
 import qs from 'qs';
 import { cache } from 'react';
 import { monthlyPayment } from './finance';
+import { externalUrl } from './format';
 import { BUILTIN_PAGES, SELL_LINK } from './builtinPages';
 import { complaintsService } from './legal';
 import type {
@@ -108,7 +109,7 @@ const SOCIALS: { key: SocialLink['key']; label: string; field: string }[] = [
 ];
 
 const socialLinks = (g: any): SocialLink[] =>
-  SOCIALS.map(({ key, label, field }) => ({ key, label, url: (g[field] || '').trim() })).filter((s) => s.url);
+  SOCIALS.map(({ key, label, field }) => ({ key, label, url: externalUrl(g[field]) })).filter((s) => s.url);
 
 /** Built-in pages stay reachable from the menu until the CMS navigation lists them itself. */
 function withBuiltinNav(nav: Link[]): Link[] {
@@ -141,7 +142,7 @@ export const getGlobal = cache(async (): Promise<GlobalSettings> => {
     businessId: g.businessId || '',
     invoicingAddress: g.invoicingAddress || '',
     socials: socialLinks(g),
-    mapsUrl: g.mapsUrl || '',
+    mapsUrl: externalUrl(g.mapsUrl),
     mapEmbedUrl: g.mapEmbedUrl || '',
     openingHours: [...(g.openingHours || [])].sort((a: any, b: any) => a.dayIndex - b.dayIndex),
     openingHoursNote: g.openingHoursNote || '',
