@@ -14,6 +14,8 @@ import Footer from '@/components/Footer';
 import WhatsAppProvider from '@/components/WhatsAppProvider';
 import ScrollFx from '@/components/ScrollFx';
 import { SITE_URL } from '@/lib/site';
+import { META_PIXEL_ID, metaPixelScript } from '@/lib/metaPixel';
+import MetaPixelRouteTracker from '@/components/MetaPixelRouteTracker';
 
 export async function generateMetadata(): Promise<Metadata> {
   const g = await getGlobal();
@@ -59,8 +61,25 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script dangerouslySetInnerHTML={{ __html: FX_SCRIPT }} />
         {/* Must run before React touches the DOM (see TRANSLATE_GUARD). */}
         <script dangerouslySetInnerHTML={{ __html: TRANSLATE_GUARD }} />
+        {/* Meta Pixel. fbevents.js is fetched async, so it does not block paint. */}
+        {META_PIXEL_ID ? (
+          <script dangerouslySetInnerHTML={{ __html: metaPixelScript(META_PIXEL_ID) }} />
+        ) : null}
       </head>
       <body>
+        {META_PIXEL_ID ? (
+          <noscript>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              height="1"
+              width="1"
+              style={{ display: 'none' }}
+              alt=""
+              src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
+            />
+          </noscript>
+        ) : null}
+        <MetaPixelRouteTracker pixelId={META_PIXEL_ID} />
         <a className="skip" href="#main">Siirry sisältöön</a>
         <WhatsAppProvider number={global.whatsappNumber} topics={global.whatsappTopics} siteUrl={SITE_URL}>
           <Header global={global} />
