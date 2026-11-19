@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import CookieSettingsLink from './CookieSettingsLink';
 import type { GlobalSettings } from '@/lib/types';
 import { telHref } from '@/lib/format';
 import { SocialIcon } from './Icons';
@@ -54,6 +55,7 @@ export default function Footer({ global }: { global: GlobalSettings }) {
           <span>© {year} {global.siteName}{global.businessId ? ` · Y-tunnus ${global.businessId}` : ''}</span>
           <nav aria-label="Alatunniste">
             {global.footerLinks.map((l) => <Link key={l.url} href={l.url}>{l.label}</Link>)}
+            <CookieSettingsLink />
           </nav>
         </div>
       </div>
