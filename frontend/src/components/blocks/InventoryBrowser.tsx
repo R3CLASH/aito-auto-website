@@ -103,7 +103,9 @@ export default function InventoryBrowser({ block, catalog, initial }: {
       high: (a, b) => b.price - a.price,
       km: (a, b) => a.mileage - b.mileage,
     };
-    return [...list].sort(by[sort]);
+    // "Tulossa pian" sinks below everything in stock, whichever order the
+    // visitor picks -- the chosen sort only decides the order within a group.
+    return [...list].sort((a, b) => Number(a.comingSoon) - Number(b.comingSoon) || by[sort](a, b));
   }, [inRange, fuel, trans, sort]);
 
   const typeChips = [{ slug: '', name: 'Kaikki', img: null as any, n: cars.length }].concat(

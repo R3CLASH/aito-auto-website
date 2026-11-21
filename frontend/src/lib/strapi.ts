@@ -234,7 +234,7 @@ export const getCatalog = cache(async (): Promise<Catalog> => {
     fetchAll('cars', {
       sort: ['createdAt:desc'],
       filters: { saleStatus: { $ne: 'sold' } },
-      fields: ['title', 'slug', 'variant', 'price', 'year', 'mileage', 'fuel', 'transmission', 'badge', 'featured', 'saleStatus', 'vatDeductible', 'monthlyInstallment', 'createdAt'],
+      fields: ['title', 'slug', 'variant', 'price', 'year', 'mileage', 'fuel', 'transmission', 'badge', 'featured', 'comingSoon', 'saleStatus', 'vatDeductible', 'monthlyInstallment', 'createdAt'],
       populate: {
         images: { fields: ['url', 'alternativeText', 'width', 'height'] },
         car_model: { fields: ['name', 'slug'], populate: { brand: { fields: ['name', 'slug'] } } },
@@ -269,6 +269,7 @@ export const getCatalog = cache(async (): Promise<Catalog> => {
         transmission: c.transmission,
         badge: c.badge || (c.saleStatus === 'reserved' ? 'VARATTU' : ''),
         featured: !!c.featured,
+        comingSoon: !!c.comingSoon,
         reserved: c.saleStatus === 'reserved',
         vatDeductible: !!c.vatDeductible,
         image: imgs[0] || null,
@@ -281,6 +282,20 @@ export const getCatalog = cache(async (): Promise<Catalog> => {
       car.href = carHref(car);
       return car;
     });
+
+  /*
+   * Cars marked "Tulossa pian" sit after everything that is actually for sale.
+   *
+   * Done here in JS rather than as a Strapi sort: the column is null on every
+   * car that existed before the field was added, and Postgres orders nulls
+   * last, which would push the whole existing stock behind the coming-soon
+   * ones -- the opposite of what is wanted. A null reads as false here.
+   *
+   * Array.sort is stable, so the createdAt ordering survives inside each group,
+   * and because the listing, the home page and the related-cars strip all read
+   * this one array, they inherit the rule without repeating it.
+   */
+  cars.sort((a, b) => Number(a.comingSoon) - Number(b.comingSoon));
 
   const brands: BrandNode[] = brandsRaw.map((b: any) => ({
     name: b.name, slug: b.slug, logo: media(b.logo),
@@ -324,6 +339,7 @@ export const getCarBySlug = cache(async (slug: string): Promise<CarDetail | null
     co2: c.co2 || null,
     badge: c.badge || (c.saleStatus === 'reserved' ? 'VARATTU' : ''),
     featured: !!c.featured,
+    comingSoon: !!c.comingSoon,
     reserved: c.saleStatus === 'reserved',
     sold: c.saleStatus === 'sold',
     vatDeductible: !!c.vatDeductible,

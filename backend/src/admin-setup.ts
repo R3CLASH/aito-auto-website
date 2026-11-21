@@ -82,7 +82,7 @@ type Layout = {
 
 const LAYOUTS: Record<string, Layout> = {
   'api::car.car': {
-    list: ['title', 'price', 'year', 'saleStatus', 'featured'],
+    list: ['title', 'price', 'year', 'saleStatus', 'featured', 'comingSoon'],
     mainField: 'title',
     sort: ['updatedAt', 'DESC'],
     fields: {
@@ -102,7 +102,8 @@ const LAYOUTS: Record<string, Layout> = {
       inspectedUntil: ['Katsastus voimassa (Inspected until)', 'Esim. 05/2027'],
       co2: ['CO₂ g/km (CO₂ emissions)'],
       badge: ['Merkintä kortissa (Card badge)', 'Lyhyt tarra kuvan päällä, esim. UUSI, NELIVETO, ALV-VÄH.'],
-      featured: ['Nosto etusivulle (Featured on home page)', 'Näytetään etusivun "Juuri pihaan" -osiossa.'],
+      featured: ['Nosto etusivulle (Featured)', 'Näytetään etusivun "Juuri pihaan" -osiossa.'],
+      comingSoon: ['Tulossa pian (Coming soon)', 'Auto siirtyy listauksissa viimeiseksi, kaikkien myynnissä olevien autojen jälkeen. Oletuksena pois päältä.'],
       vatDeductible: ['ALV-vähennyskelpoinen (VAT deductible)'],
       saleStatus: ['Myyntitila (Sale status)', 'available = myynnissä · reserved = varattu (VARATTU-merkintä) · sold = myyty (piilotetaan listauksista)'],
       images: ['Kuvat (Images)', 'Ensimmäinen kuva on kansikuva. Järjestä vetämällä. Ilman kuvia näytetään ajoneuvotyypin siluetti.'],
@@ -250,7 +251,7 @@ const LAYOUTS: Record<string, Layout> = {
   },
 };
 
-const LAYOUT_VERSION = 3;
+const LAYOUT_VERSION = 4;
 
 export async function applyAdminLayouts(strapi: Core.Strapi) {
   const store = strapi.store({ type: 'plugin', name: 'aito-setup', key: 'admin-layouts' });

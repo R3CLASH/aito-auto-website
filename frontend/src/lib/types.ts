@@ -69,6 +69,7 @@ export type CarSummary = {
   transmission: string;
   badge: string;
   featured: boolean;
+  comingSoon: boolean;
   reserved: boolean;
   vatDeductible: boolean;
   image: Media | null;

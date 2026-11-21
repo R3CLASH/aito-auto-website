@@ -17,7 +17,7 @@ function similar(car: CarDetail, catalog: Catalog) {
   const out = others.filter((c) => c.model.slug === car.model.slug);
   for (const c of others.filter((c) => c.brand.slug === car.brand.slug)) if (out.length < 3 && !out.includes(c)) out.push(c);
   for (const c of others.filter((c) => c.type?.slug === car.type?.slug)) if (out.length < 3 && !out.includes(c)) out.push(c);
-  return out.slice(0, 3);
+  return out.sort((a, b) => Number(a.comingSoon) - Number(b.comingSoon)).slice(0, 3);
 }
 
 export default function CarDetailView({ car, tpl, ctx, templateBlocks }: {

@@ -90,7 +90,9 @@ export function LatestCars({ block, ctx }: P) {
     const rest = ctx.catalog.cars.filter((c) => !list.includes(c));
     list = [...list, ...rest];
   }
-  list = list.slice(0, limit);
+  // Sink coming-soon cars before trimming, so the strip fills with cars that
+  // are actually in stock even when a coming-soon one is marked as featured.
+  list = [...list].sort((a, b) => Number(a.comingSoon) - Number(b.comingSoon)).slice(0, limit);
   if (!list.length) return null;
   return (
     <section className="wrap sec" style={{ paddingTop: 90 }}>

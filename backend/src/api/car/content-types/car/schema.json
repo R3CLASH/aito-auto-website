@@ -110,6 +110,10 @@
       "type": "boolean",
       "default": false
     },
+    "comingSoon": {
+      "type": "boolean",
+      "default": false
+    },
     "vatDeductible": {
       "type": "boolean",
       "default": false
