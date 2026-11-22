@@ -16,6 +16,8 @@ import ScrollFx from '@/components/ScrollFx';
 import { SITE_URL } from '@/lib/site';
 import { META_PIXEL_ID } from '@/lib/metaPixel';
 import MetaPixel from '@/components/MetaPixel';
+import { GTM_ID } from '@/lib/gtm';
+import GoogleTagManager from '@/components/GoogleTagManager';
 import CookieConsent from '@/components/CookieConsent';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -71,7 +73,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Footer global={global} />
         </WhatsAppProvider>
         <ScrollFx />
-        {/* Loads the Meta Pixel only once marketing cookies are accepted. */}
+        {/* Both load only once cookies are accepted; see each component. */}
+        <GoogleTagManager gtmId={GTM_ID} />
         <MetaPixel pixelId={META_PIXEL_ID} />
         <CookieConsent />
       </body>

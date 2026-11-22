@@ -61,9 +61,10 @@ export default function CookieConsent() {
         <div className="cc-copy">
           <h2 id="cc-title" className="cc-title">Evästeet</h2>
           <p>
-            Käytämme sivuston toiminnan kannalta välttämättömiä evästeitä aina. Markkinoinnin
-            evästeitä (Meta-pikseli) käytämme vain suostumuksellasi – niiden avulla mittaamme
-            mainontamme toimivuutta. Voit muuttaa valintaasi milloin tahansa sivun alareunasta.{' '}
+            Käytämme sivuston toiminnan kannalta välttämättömiä evästeitä aina. Analytiikka- ja
+            markkinointievästeitä (Google Analytics ja Meta-pikseli) käytämme vain
+            suostumuksellasi – niiden avulla mittaamme sivuston käyttöä ja mainontamme
+            toimivuutta. Voit muuttaa valintaasi milloin tahansa sivun alareunasta.{' '}
             <Link href="/tietosuojaseloste">Lue tietosuojaselosteesta</Link>.
           </p>
         </div>
